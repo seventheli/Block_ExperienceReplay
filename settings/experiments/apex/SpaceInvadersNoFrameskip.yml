@@ -1,7 +1,7 @@
 mlflow:
   experiment: "SpaceInvadersNoFrameskip"
   url: "http://127.0.0.1:9999"
-  user: "AutoDL4"
+  user: "User4"
 apex:
   env: SpaceInvadersNoFrameskip-v4
   run: APEX

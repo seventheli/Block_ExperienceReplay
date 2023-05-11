@@ -1,7 +1,7 @@
 mlflow:
   experiment: "AsteroidsNoFrameskip"
   url: "http://127.0.0.1:9999"
-  user: "AutoDL6"
+  user: "User6"
 dqn:
   env: AsteroidsNoFrameskip-v4
   run: DQN

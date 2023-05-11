@@ -1,7 +1,7 @@
 mlflow:
   experiment: "BattleZoneNoFrameskip"
   url: "http://127.0.0.1:9999"
-  user: "AutoDL1"
+  user: "User1"
 dqn:
   env: BattleZoneNoFrameskip-v4
   run: DQN

@@ -1,7 +1,7 @@
 mlflow:
   experiment: "EnduroNoFrameskip"
   url: "http://127.0.0.1:9999"
-  user: "AutoDL5"
+  user: "User5"
 apex:
   env: EnduroNoFrameskip-v4
   run: APEX
