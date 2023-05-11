@@ -1,0 +1,4 @@
+replay_buffer_config:
+  type: "PBER"
+  fragment_length: 4
+  sub_buffer_size: 4
