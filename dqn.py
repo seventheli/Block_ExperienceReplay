@@ -32,8 +32,8 @@ mlflow_run = mlflow.start_run(run_name="DQN_PER_" + datetime.datetime.now().strf
 
 # Log parameters
 hyper_parameters_log = dict(collections.ChainMap({"type": "PER"},
-                                                 settings.apex.hyper_parameters.to_dict(),
-                                                 settings.apex.hyper_parameters.to_dict()["replay_buffer_config"]))
+                                                 settings.dqn.hyper_parameters.to_dict(),
+                                                 settings.dqn.hyper_parameters.to_dict()["replay_buffer_config"]))
 hyper_parameters_log.pop("replay_buffer_config")
 mlflow.log_params(hyper_parameters_log)
 
