@@ -1,38 +1,38 @@
 mlflow:
-  experiment: "BreakoutNoFrameskip"
+  experiment: "AssaultNoFrameskip"
   url: "http://127.0.0.1:9999"
-  user: "User"
+  user: "User4"
 dqn:
-  env: BreakoutNoFrameskip-v4
+  env: AssaultNoFrameskip-v4
   run: DQN
   hyper_parameters:
     double_q: false
     dueling: false
     num_atoms: 1
     noisy: false
-    n_step: 3
-    lr: .0001
+    prioritized_replay: false
+    n_step: 1
+    lr: .0000625
     adam_epsilon: .00015
     hiddens: [ 512 ]
+    learning_starts: 20000
     # Extra
     num_gpus: 1
     framework: "torch"
     evaluation_duration_unit: "episodes"
     rollout_fragment_length: 20
     # DQN
-    num_workers: 1
     num_envs_per_worker: 8
-    num_cpus_per_worker: 2
-    # num_gpus_per_worker: 0
+    num_gpus_per_worker: 0
     train_batch_size: 512
-    target_network_update_freq: 50000
-    min_sample_timesteps_per_iteration: 25000
+    target_network_update_freq: 8000
+    min_sample_timesteps_per_iteration: 10000
     replay_buffer_config:
       capacity: 1000000
       prioritized_replay_beta: 1
       prioritized_replay_alpha: 0.5
 control:
-  score: 400
+  score: 5000
   min_time: 144000
   max_time: 216000
   log: 1

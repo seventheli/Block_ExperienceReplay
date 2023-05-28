@@ -9,8 +9,7 @@ from utils import init_ray
 from algorithms.ray_apex_dqn_pber import APEXPolicyWithPBER
 from ray.rllib.algorithms.apex_dqn.apex_dqn import ApexDQNConfig
 from ray.rllib.env.wrappers.atari_wrappers import wrap_deepmind
-from replay_buffer.ray_pber import MultiAgentBatchedPrioritizedReplayBuffer
-
+from replay_buffer.pber import MultiAgentBatchedPrioritizedReplayBuffer
 checkpoint_path = "./checkpoint/"
 init_ray("./ray_config.yml")
 
@@ -67,6 +66,8 @@ replay_buffer_config = {
     "rollout_fragment_length": ex_setting.replay_buffer_config.fragment_length,
 }
 hyper_parameters["replay_buffer_config"] = replay_buffer_config
+
+
 
 algorithm = APEXPolicyWithPBER(hyper_parameters, env=settings.apex.env)
 

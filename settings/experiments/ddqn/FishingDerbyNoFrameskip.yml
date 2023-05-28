@@ -1,16 +1,16 @@
 mlflow:
-  experiment: "CrazyClimberNoFrameskip"
+  experiment: "FishingDerbyNoFrameskip"
   url: "http://127.0.0.1:9999"
-  user: "User3"
+  user: "User"
 dqn:
-  env: CrazyClimberNoFrameskip-v4
+  env: FishingDerbyNoFrameskip-v4
   run: DQN
   hyper_parameters:
     double_q: false
     dueling: false
     num_atoms: 1
     noisy: false
-    n_step: 3
+    n_step: 1
     lr: .0001
     adam_epsilon: .00015
     hiddens: [ 512 ]
@@ -22,7 +22,7 @@ dqn:
     # DQN
     num_workers: 1
     num_envs_per_worker: 8
-    num_gpus_per_worker: 0.01
+    # num_gpus_per_worker: 0
     train_batch_size: 512
     target_network_update_freq: 50000
     min_sample_timesteps_per_iteration: 25000
@@ -31,8 +31,8 @@ dqn:
       prioritized_replay_beta: 1
       prioritized_replay_alpha: 0.5
 control:
-  score: 100000
+  score: 45
   min_time: 144000
   max_time: 216000
-  log: 1
+  log: 5
   save: 100

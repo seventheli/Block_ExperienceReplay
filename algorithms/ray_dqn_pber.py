@@ -12,7 +12,7 @@ from ray.rllib.utils.metrics.learner_info import LEARNER_STATS_KEY
 from ray.rllib.execution.common import LAST_TARGET_UPDATE_TS, NUM_TARGET_UPDATES
 from ray.rllib.utils.replay_buffers.utils import sample_min_n_steps_from_buffer
 from ray.rllib.algorithms.dqn.dqn import calculate_rr_weights
-from replay_buffer.ray_pber import MultiAgentBatchedPrioritizedReplayBuffer
+from replay_buffer.pber import MultiAgentBatchedPrioritizedReplayBuffer
 
 logger = logging.getLogger(__name__)
 

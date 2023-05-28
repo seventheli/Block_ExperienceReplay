@@ -1,6 +1,7 @@
 import os
 import ray
 import yaml
+import mlflow
 import numpy as np
 from gym import spaces
 from func_timeout import func_set_timeout
@@ -22,10 +23,18 @@ def check_path(path):
         os.makedirs(path)
 
 
-@func_set_timeout(10)
+@func_set_timeout(5)
 def log_with_timeout(client, run_id, key, value, step):
     try:
         client.log_metric(run_id, key=key, value=value, step=step)
+    except:
+        pass
+
+
+@func_set_timeout(5)
+def logs_with_timeout(data):
+    try:
+        mlflow.log_metrics(data)
     except:
         pass
 
