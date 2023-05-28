@@ -1,7 +1,7 @@
 mlflow:
   experiment: "Simple-Q*BertNoFrameskip"
   url: "http://127.0.0.1:9999"
-  user: "User2"
+  user: "UD2"
 dqn:
   env: QbertNoFrameskip
   run: DQN
