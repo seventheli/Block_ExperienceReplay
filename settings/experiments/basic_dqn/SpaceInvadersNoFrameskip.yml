@@ -1,7 +1,7 @@
 mlflow:
-  experiment: "SpaceInvadersNoFrameskip"
+  experiment: "Simple-SpaceInvadersNoFrameskip"
   url: "http://127.0.0.1:9999"
-  user: "User4"
+  user: "UD2"
 dqn:
   env: SpaceInvadersNoFrameskip
   run: DQN
@@ -16,7 +16,7 @@ dqn:
     hiddens: [ 512 ]
     num_steps_sampled_before_learning_starts: 20000
     evaluation_duration_unit: "episodes"
-    evaluation_interval: 50
+    evaluation_interval: 20
     evaluation_num_workers: 2
     evaluation_duration: 10
     evaluation_parallel_to_training: true
