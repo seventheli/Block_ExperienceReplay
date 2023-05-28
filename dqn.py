@@ -35,7 +35,7 @@ mlflow_run = mlflow.start_run(run_name=run_name,
 # Check path available
 log_path = path.join(settings.log.save_file, settings.dqn.env)
 check_path(log_path)
-log_path = path.join(log_path, run_name)
+log_path = path.join(log_path, )
 check_path(log_path)
 
 # Set algorithm
