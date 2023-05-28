@@ -19,23 +19,24 @@ parser.add_argument("-BZ", "--batch_size", dest="batch_size", type=int, default=
 setting_path = parser.parse_args().setting_path
 settings = Dynaconf(envvar_prefix="DYNACONF", settings_files=setting_path)
 
-# Check path available
-log_path = path.join(settings.log.save_file, settings.dqn.env)
-check_path(log_path)
-log_path = path.join(log_path, "DQN")
-check_path(log_path)
-
 # Attributes
 batch_size = parser.parse_args().batch_size
 if batch_size != 0:
     settings["dqn"]["hyper_parameters"]["train_batch_size"] = batch_size
 
 # Set mlflow
+run_name = "DQN_ER_" + datetime.datetime.now().strftime("%Y%m%d")
 mlflow.set_tracking_uri(settings.mlflow.url)
 mlflow.set_experiment(experiment_name=settings.mlflow.experiment)
 mlflow_client = mlflow.tracking.MlflowClient()
-mlflow_run = mlflow.start_run(run_name="DQN_ER_" + datetime.datetime.now().strftime("%Y%m%d"),
+mlflow_run = mlflow.start_run(run_name=run_name,
                               tags={"mlflow.user": settings.mlflow.user})
+
+# Check path available
+log_path = path.join(settings.log.save_file, settings.dqn.env)
+check_path(log_path)
+log_path = path.join(log_path, run_name)
+check_path(log_path)
 
 # Set algorithm
 hyper_parameters = settings.dqn.hyper_parameters.to_dict()
