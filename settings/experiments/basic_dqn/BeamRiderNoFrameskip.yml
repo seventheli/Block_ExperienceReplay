@@ -15,10 +15,14 @@ dqn:
     adam_epsilon: .00015
     hiddens: [ 512 ]
     num_steps_sampled_before_learning_starts: 20000
+    evaluation_duration_unit: "episodes"
+    evaluation_interval: 10
+    evaluation_num_workers: 2
+    evaluation_duration: 10
+    evaluation_parallel_to_training: true
     # Extra
     num_gpus: 1
     framework: "torch"
-    evaluation_duration_unit: "episodes"
     # DQN
     num_envs_per_worker: 1
     num_gpus_per_worker: 0
@@ -29,8 +33,6 @@ dqn:
     replay_buffer_config:
       type: 'ReplayBuffer'
       capacity: 1000000
-      prioritized_replay_beta: 1
-      prioritized_replay_alpha: 0.5
 log:
   save_file: "/home/seventheli/logging/"
   score: 15000
