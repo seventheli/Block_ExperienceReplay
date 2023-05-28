@@ -34,7 +34,7 @@ if batch_size != 0:
 mlflow.set_tracking_uri(settings.mlflow.url)
 mlflow.set_experiment(experiment_name=settings.mlflow.experiment)
 mlflow_client = mlflow.tracking.MlflowClient()
-mlflow_run = mlflow.start_run(run_name="DQN" + datetime.datetime.now().strftime("%Y%m%d"),
+mlflow_run = mlflow.start_run(run_name="DQN_ER_" + datetime.datetime.now().strftime("%Y%m%d"),
                               tags={"mlflow.user": settings.mlflow.user})
 
 # Set algorithm

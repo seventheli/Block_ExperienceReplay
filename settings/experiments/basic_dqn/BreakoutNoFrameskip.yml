@@ -15,14 +15,19 @@ dqn:
     adam_epsilon: .00015
     hiddens: [ 512 ]
     num_steps_sampled_before_learning_starts: 20000
+    evaluation_duration_unit: "episodes"
+    evaluation_interval: 50
+    evaluation_num_workers: 2
+    evaluation_duration: 10
+    evaluation_parallel_to_training: true
     # Extra
     num_gpus: 1
     framework: "torch"
-    evaluation_duration_unit: "episodes"
     # DQN
     num_envs_per_worker: 1
     num_gpus_per_worker: 0
-    train_batch_size: 512
+    sample_batch_size: 4
+    train_batch_size: 32
     target_network_update_freq: 8000
     min_sample_timesteps_per_iteration: 10000
     replay_buffer_config:
