@@ -39,6 +39,17 @@ def logs_with_timeout(data):
         pass
 
 
+def convert_np_arrays(obj):
+    if isinstance(obj, np.ndarray):
+        return obj.tolist()
+    elif isinstance(obj, dict):
+        return {key: convert_np_arrays(value) for key, value in obj.items()}
+    elif isinstance(obj, list):
+        return [convert_np_arrays(item) for item in obj]
+    else:
+        return obj
+
+
 # This function is copied from:
 # https://github.com/DLR-RM/stable-baselines3/
 def get_obs_shape(

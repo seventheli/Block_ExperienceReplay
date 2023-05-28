@@ -6,7 +6,7 @@ import datetime
 import collections
 from os import path
 from dynaconf import Dynaconf
-from utils import init_ray, check_path, log_with_timeout
+from utils import init_ray, check_path, log_with_timeout, convert_np_arrays
 from ray.rllib.algorithms.dqn import DQN
 
 checkpoint_path = "./checkpoint/"
@@ -29,7 +29,7 @@ check_path(log_path)
 # Attributes
 batch_size = parser.parse_args().batch_size
 if batch_size != 0:
-    settings["ddqn"]["hyper_parameters"]["train_batch_size"] = batch_size
+    settings["dqn"]["hyper_parameters"]["train_batch_size"] = batch_size
 
 # Set mlflow
 mlflow.set_tracking_uri(settings.mlflow.url)
@@ -50,4 +50,4 @@ for i in tqdm.tqdm(range(1, 10000)):
             log_with_timeout()
     with open(path.join(log_path, str(i) + ".json"), "w") as f:
         result["config"] = None
-        json.dump(result, f)
+        json.dump(convert_np_arrays(result), f)

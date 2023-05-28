@@ -28,8 +28,6 @@ dqn:
     replay_buffer_config:
       type: 'ReplayBuffer'
       capacity: 1000000
-      prioritized_replay_beta: 1
-      prioritized_replay_alpha: 0.5
 log:
   save_file: "/home/seventheli/logging/"
   score: 400
