@@ -12,13 +12,13 @@ from ray.rllib.utils.metrics.learner_info import LEARNER_STATS_KEY
 from ray.rllib.execution.common import LAST_TARGET_UPDATE_TS, NUM_TARGET_UPDATES
 from ray.rllib.utils.replay_buffers.utils import sample_min_n_steps_from_buffer
 from ray.rllib.algorithms.dqn.dqn import calculate_rr_weights
-from replay_buffer.pber import MultiAgentBatchedPrioritizedReplayBuffer
+from replay_buffer.pber import BlockPrioritizedReplayBuffer
 
 logger = logging.getLogger(__name__)
 
 @DeveloperAPI
 def update_priorities_in_replay_buffer(
-    replay_buffer: MultiAgentBatchedPrioritizedReplayBuffer,
+    replay_buffer: BlockPrioritizedReplayBuffer,
     config: AlgorithmConfigDict,
     train_batch: SampleBatchType,
     train_results: ResultDict,
@@ -41,7 +41,7 @@ def update_priorities_in_replay_buffer(
 
 
     # Only update priorities if buffer supports them.
-    if isinstance(replay_buffer, MultiAgentBatchedPrioritizedReplayBuffer):
+    if isinstance(replay_buffer, BlockPrioritizedReplayBuffer):
         # Go through training results for the different policies (maybe multi-agent).
         prio_dict = {}
         for policy_id, info in train_results.items():

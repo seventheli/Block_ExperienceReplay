@@ -8,7 +8,7 @@ import collections
 from os import path
 from dynaconf import Dynaconf
 from utils import init_ray, check_path, log_with_timeout
-from algorithms.ray_dqn_pber import DQNPolicyWithPBER
+from algorithms.dqn_pber import DQNPolicyWithPBER
 from ray.rllib.algorithms.dqn import DQNConfig
 from ray.rllib.env.wrappers.atari_wrappers import wrap_deepmind
 from replay_buffer.ber import CustomReplayBuffer

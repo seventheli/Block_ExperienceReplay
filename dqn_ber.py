@@ -8,10 +8,10 @@ import collections
 from os import path
 from dynaconf import Dynaconf
 from utils import init_ray, check_path, log_with_timeout
-from algorithms.ray_dqn_pber import DQNPolicyWithPBER
+from algorithms.dqn_pber import DQNPolicyWithPBER
 from ray.rllib.algorithms.dqn import DQNConfig
 from ray.rllib.env.wrappers.atari_wrappers import wrap_deepmind
-from replay_buffer.ber import CustomReplayBuffer
+from replay_buffer.ber import BlockReplayBuffer
 
 checkpoint_path = "./checkpoint/"
 init_ray("./ray_config.yml")
@@ -67,7 +67,7 @@ hyper_parameters = settings.dqn.hyper_parameters.to_dict()
 replay_buffer_config = {
     **DQNConfig().replay_buffer_config,
     **settings.dqn.hyper_parameters.replay_buffer_config.to_dict(),
-    "type": MultiAgentBatchedPrioritizedReplayBuffer,
+    "type": BlockReplayBuffer,
     "obs_space": env_example.observation_space,
     "action_space": env_example.action_space,
     "sub_buffer_size": ex_setting.replay_buffer_config.sub_buffer_size,

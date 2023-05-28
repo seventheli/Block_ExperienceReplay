@@ -9,7 +9,7 @@ from ray.rllib.utils.replay_buffers import StorageUnit
 logger = logging.getLogger(__name__)
 
 
-class CustomPrioritizedReplayBuffer(PrioritizedReplayBuffer):
+class BlockPrioritizedReplayBuffer(PrioritizedReplayBuffer):
     def __init__(
             self,
             obs_space: Space,
@@ -20,13 +20,13 @@ class CustomPrioritizedReplayBuffer(PrioritizedReplayBuffer):
             prioritized_replay_alpha: float = 0.6,
             **kwargs
     ):
-        super(CustomPrioritizedReplayBuffer, self).__init__(capacity=capacity,
+        super(BlockPrioritizedReplayBuffer, self).__init__(capacity=capacity,
                                                             storage_unit=StorageUnit.FRAGMENTS,
                                                             alpha=prioritized_replay_alpha, **kwargs)
         self.base_buffer = BaseBuffer(sub_buffer_size, obs_space, action_space, randomly)
 
     def sample(self, num_items: int, **kwargs):
-        return super(CustomPrioritizedReplayBuffer, self).sample(num_items, **kwargs)
+        return super(BlockPrioritizedReplayBuffer, self).sample(num_items, **kwargs)
 
     def add(self, batch: SampleBatchType, **kwargs) -> None:
         """Adds a batch of experiences to this buffer.

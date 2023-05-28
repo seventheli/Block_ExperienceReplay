@@ -14,7 +14,7 @@ from ray.util.timer import _Timer
 logger = logging.getLogger(__name__)
 
 
-class CustomReplayBuffer(ReplayBuffer):
+class BlockReplayBuffer(ReplayBuffer):
     def __init__(
             self,
             obs_space: Space,
@@ -23,11 +23,11 @@ class CustomReplayBuffer(ReplayBuffer):
             sub_buffer_size: int = 8,
             **kwargs
     ):
-        super(CustomReplayBuffer, self).__init__(**kwargs)
+        super(BlockReplayBuffer, self).__init__(**kwargs)
         self.base_buffer = BaseBuffer(sub_buffer_size, obs_space, action_space, randomly)
 
     def sample(self, num_items: int, **kwargs):
-        return super(CustomReplayBuffer, self).sample(num_items, **kwargs)
+        return super(BlockReplayBuffer, self).sample(num_items, **kwargs)
 
     def add(self, batch: SampleBatchType, **kwargs) -> None:
         """Adds a batch of experiences to this buffer.
