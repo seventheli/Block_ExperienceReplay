@@ -5,7 +5,7 @@ from ray.rllib.algorithms.simple_q.simple_q import SimpleQ
 from ray.rllib.execution.rollout_ops import synchronous_parallel_sample
 from ray.rllib.execution.train_ops import train_one_step, multi_gpu_train_one_step
 from ray.rllib.utils.annotations import override
-from ray.rllib.utils.typing import AlgorithmConfigDict, EnvCreator, ResultDict
+from ray.rllib.utils.typing import ResultDict
 from ray.rllib.utils.metrics import NUM_ENV_STEPS_SAMPLED, NUM_AGENT_STEPS_SAMPLED, SYNCH_WORKER_WEIGHTS_TIMER
 from ray.rllib.execution.common import LAST_TARGET_UPDATE_TS, NUM_TARGET_UPDATES
 from ray.rllib.utils.replay_buffers.utils import sample_min_n_steps_from_buffer
@@ -22,9 +22,6 @@ class DQNWithLogging(DQN):
         "update": 0,
         "all": 0
     }
-
-    def _init(self, config: AlgorithmConfigDict, env_creator: EnvCreator) -> None:
-        pass
 
     @override(SimpleQ)
     def training_step(self) -> ResultDict:
