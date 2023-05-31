@@ -56,6 +56,7 @@ else:
     algorithm = DQN(config=hyper_parameters, env=settings.dqn.env)
 
 # Set MLflow
+print(run_name)
 mlflow.set_tracking_uri(settings.mlflow.url)
 mlflow.set_experiment(experiment_name=settings.mlflow.experiment)
 mlflow_client = mlflow.tracking.MlflowClient()
