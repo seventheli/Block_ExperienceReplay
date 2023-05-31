@@ -15,7 +15,7 @@ from ray.util.timer import _Timer
 logger = logging.getLogger(__name__)
 
 
-class BlockedPrioritizedReplayBuffer(PrioritizedReplayBuffer):
+class BlockPrioritizedReplayBuffer(PrioritizedReplayBuffer):
     def __init__(
             self,
             obs_space: Space,
@@ -25,12 +25,12 @@ class BlockedPrioritizedReplayBuffer(PrioritizedReplayBuffer):
             beta=0.6,
             **kwargs
     ):
-        super(BlockedPrioritizedReplayBuffer, self).__init__(**kwargs)
+        super(BlockPrioritizedReplayBuffer, self).__init__(**kwargs)
         self.beta = beta
         self.base_buffer = BaseBuffer(sub_buffer_size, obs_space, action_space, randomly)
 
     def sample(self, num_items: int, **kwargs):
-        return super(BlockedPrioritizedReplayBuffer, self).sample(num_items, **kwargs)
+        return super(BlockPrioritizedReplayBuffer, self).sample(num_items, **kwargs)
 
     def add(self, batch: SampleBatchType, **kwargs) -> None:
         """Adds a batch of experiences to this buffer.
@@ -56,7 +56,7 @@ class BlockedPrioritizedReplayBuffer(PrioritizedReplayBuffer):
 
 
 @DeveloperAPI
-class MultiAgentBlockedPrioritizedReplayBuffer(MultiAgentReplayBuffer, BlockedPrioritizedReplayBuffer):
+class MultiAgentBlockPrioritizedReplayBuffer(MultiAgentReplayBuffer, BlockPrioritizedReplayBuffer):
     """A prioritized replay buffer shard for multiagent setups.
 
     This buffer is meant to be run in parallel to distribute experiences
@@ -79,7 +79,7 @@ class MultiAgentBlockedPrioritizedReplayBuffer(MultiAgentReplayBuffer, BlockedPr
             replay_burn_in: int = 0,
             replay_zero_init_states: bool = True,
             prioritized_replay_alpha: float = 0.6,
-            prioritized_replay_beta: float = 0.4,
+            prioritized_replay_beta: float = 1.0,
             prioritized_replay_eps: float = 1e-6,
             **kwargs
     ):
@@ -146,7 +146,7 @@ class MultiAgentBlockedPrioritizedReplayBuffer(MultiAgentReplayBuffer, BlockedPr
                 )
             kwargs["replay_mode"] = "independent"
         prioritized_replay_buffer_config = {
-            "type": BlockedPrioritizedReplayBuffer,
+            "type": BlockPrioritizedReplayBuffer,
             "action_space": action_space,
             "obs_space": obs_space,
             "storage_unit": StorageUnit.FRAGMENTS,
