@@ -1,4 +1,5 @@
 import logging
+import numpy as np
 from ray.util import log_once
 from ray.rllib.utils.typing import EnvCreator
 from ray.rllib.algorithms.dqn import DQN
@@ -6,19 +7,20 @@ from ray.rllib.algorithms.simple_q.simple_q import SimpleQ
 from ray.rllib.execution.rollout_ops import synchronous_parallel_sample
 from ray.rllib.execution.train_ops import train_one_step, multi_gpu_train_one_step
 from ray.rllib.utils.annotations import override, DeveloperAPI
-from ray.rllib.utils.typing import ResultDict, SampleBatchType, AlgorithmConfigDict
+from ray.rllib.utils.typing import ResultDict, SampleBatchType, AlgorithmConfigDict, SampleBatch
 from ray.rllib.utils.metrics import NUM_ENV_STEPS_SAMPLED, NUM_AGENT_STEPS_SAMPLED, SYNCH_WORKER_WEIGHTS_TIMER
 from ray.rllib.utils.metrics.learner_info import LEARNER_STATS_KEY
 from ray.rllib.execution.common import LAST_TARGET_UPDATE_TS, NUM_TARGET_UPDATES
 from ray.rllib.utils.replay_buffers.utils import sample_min_n_steps_from_buffer
 from ray.rllib.algorithms.dqn.dqn import calculate_rr_weights
-from replay_buffer.pber import BlockPrioritizedReplayBuffer
+from replay_buffer.mbper import MultiAgentBlockPrioritizedReplayBuffer
+
 
 logger = logging.getLogger(__name__)
 
 @DeveloperAPI
 def update_priorities_in_replay_buffer(
-    replay_buffer: BlockPrioritizedReplayBuffer,
+    replay_buffer: MultiAgentBlockPrioritizedReplayBuffer,
     config: AlgorithmConfigDict,
     train_batch: SampleBatchType,
     train_results: ResultDict,
@@ -41,16 +43,39 @@ def update_priorities_in_replay_buffer(
 
 
     # Only update priorities if buffer supports them.
-    if isinstance(replay_buffer, BlockPrioritizedReplayBuffer):
+    if isinstance(replay_buffer, MultiAgentBlockPrioritizedReplayBuffer):
         # Go through training results for the different policies (maybe multi-agent).
         prio_dict = {}
         for policy_id, info in train_results.items():
             td_error = info.get("td_error", info[LEARNER_STATS_KEY].get("td_error"))
+
+            policy_batch = train_batch.policy_batches[policy_id]
             # Set the get_interceptor to None in order to be able to access the numpy
             # arrays directly (instead of e.g. a torch array).
-            train_batch.policy_batches[policy_id].set_get_interceptor(None)
+            policy_batch.set_get_interceptor(None)
             # Get the replay buffer row indices that make up the `train_batch`.
-            batch_indices = train_batch.policy_batches[policy_id].get("batch_indexes")
+            batch_indices = policy_batch.get("batch_indexes")
+
+            if SampleBatch.SEQ_LENS in policy_batch:
+                # Batch_indices are represented per column, in order to update
+                # priorities, we need one index per td_error
+                _batch_indices = []
+
+                # Sequenced batches have been zero padded to max_seq_len.
+                # Depending on how batches are split during learning, not all
+                # sequences have an associated td_error (trailing ones missing).
+                if policy_batch.zero_padded:
+                    seq_lens = len(td_error) * [policy_batch.max_seq_len]
+                else:
+                    seq_lens = policy_batch[SampleBatch.SEQ_LENS][: len(td_error)]
+
+                # Go through all indices by sequence that they represent and shrink
+                # them to one index per sequences
+                sequence_sum = 0
+                for seq_len in seq_lens:
+                    _batch_indices.append(batch_indices[sequence_sum])
+                    sequence_sum += seq_len
+                batch_indices = np.array(_batch_indices)
 
             if td_error is None:
                 if log_once(
@@ -78,11 +103,11 @@ def update_priorities_in_replay_buffer(
 
             #  Try to transform batch_indices to td_error dimensions
             if len(batch_indices) != len(td_error):
-                T = replay_buffer.replay_sequence_length
+                t = replay_buffer.replay_sequence_length
                 assert (
-                    len(batch_indices) > len(td_error) and len(batch_indices) % T == 0
+                    len(batch_indices) > len(td_error) and len(batch_indices) % t == 0
                 )
-                batch_indices = batch_indices.reshape([-1, T])[:, 0]
+                batch_indices = batch_indices.reshape([-1, t])[:, 0]
                 assert len(batch_indices) == len(td_error)
 
             # The different with original DQN update_priorities_in_replay_buffer
@@ -96,10 +121,13 @@ def update_priorities_in_replay_buffer(
         # policies.
         replay_buffer.update_priorities(prio_dict)
 
-class DQNPolicyWithPBER(DQN):
+class DDQNWithMPBER(DQN):
 
     def _init(self, config: AlgorithmConfigDict, env_creator: EnvCreator) -> None:
-        super(DQNPolicyWithPBER, self)._init(config, env_creator)
+        super(DDQNWithMPBER, self)._init(config, env_creator)
+
+    @override(SimpleQ)
+
 
     @override(SimpleQ)
     def training_step(self) -> ResultDict:
