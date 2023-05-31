@@ -6,8 +6,9 @@ from ray.rllib.algorithms.dqn import DQN
 from ray.rllib.algorithms.simple_q.simple_q import SimpleQ
 from ray.rllib.execution.rollout_ops import synchronous_parallel_sample
 from ray.rllib.execution.train_ops import train_one_step, multi_gpu_train_one_step
+from ray.rllib.policy.sample_batch import SampleBatch
 from ray.rllib.utils.annotations import override, DeveloperAPI
-from ray.rllib.utils.typing import ResultDict, SampleBatchType, AlgorithmConfigDict, SampleBatch
+from ray.rllib.utils.typing import ResultDict, SampleBatchType, AlgorithmConfigDict
 from ray.rllib.utils.metrics import NUM_ENV_STEPS_SAMPLED, NUM_AGENT_STEPS_SAMPLED, SYNCH_WORKER_WEIGHTS_TIMER
 from ray.rllib.utils.metrics.learner_info import LEARNER_STATS_KEY
 from ray.rllib.execution.common import LAST_TARGET_UPDATE_TS, NUM_TARGET_UPDATES
