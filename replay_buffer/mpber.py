@@ -15,7 +15,7 @@ from ray.util.timer import _Timer
 logger = logging.getLogger(__name__)
 
 
-class BlockPrioritizedReplayBuffer(PrioritizedReplayBuffer):
+class PrioritizedBlockReplayBuffer(PrioritizedReplayBuffer):
     def __init__(
             self,
             obs_space: Space,
@@ -25,12 +25,12 @@ class BlockPrioritizedReplayBuffer(PrioritizedReplayBuffer):
             beta=0.6,
             **kwargs
     ):
-        super(BlockPrioritizedReplayBuffer, self).__init__(**kwargs)
+        super(PrioritizedBlockReplayBuffer, self).__init__(**kwargs)
         self.beta = beta
         self.base_buffer = BaseBuffer(sub_buffer_size, obs_space, action_space, randomly)
 
     def sample(self, num_items: int, **kwargs):
-        return super(BlockPrioritizedReplayBuffer, self).sample(num_items, **kwargs)
+        return super(PrioritizedBlockReplayBuffer, self).sample(num_items, **kwargs)
 
     def add(self, batch: SampleBatchType, **kwargs) -> None:
         """Adds a batch of experiences to this buffer.
@@ -56,7 +56,7 @@ class BlockPrioritizedReplayBuffer(PrioritizedReplayBuffer):
 
 
 @DeveloperAPI
-class MultiAgentBlockPrioritizedReplayBuffer(MultiAgentReplayBuffer, BlockPrioritizedReplayBuffer):
+class MultiAgentPrioritizedBlockReplayBuffer(MultiAgentReplayBuffer, PrioritizedBlockReplayBuffer):
     """A prioritized replay buffer shard for multiagent setups.
 
     This buffer is meant to be run in parallel to distribute experiences
@@ -146,7 +146,7 @@ class MultiAgentBlockPrioritizedReplayBuffer(MultiAgentReplayBuffer, BlockPriori
                 )
             kwargs["replay_mode"] = "independent"
         prioritized_replay_buffer_config = {
-            "type": BlockPrioritizedReplayBuffer,
+            "type": PrioritizedBlockReplayBuffer,
             "action_space": action_space,
             "obs_space": obs_space,
             "storage_unit": StorageUnit.FRAGMENTS,

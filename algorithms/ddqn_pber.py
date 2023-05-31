@@ -14,7 +14,7 @@ from ray.rllib.utils.metrics.learner_info import LEARNER_STATS_KEY
 from ray.rllib.execution.common import LAST_TARGET_UPDATE_TS, NUM_TARGET_UPDATES
 from ray.rllib.utils.replay_buffers.utils import sample_min_n_steps_from_buffer
 from ray.rllib.algorithms.dqn.dqn import calculate_rr_weights
-from replay_buffer.mbper import MultiAgentBlockPrioritizedReplayBuffer
+from replay_buffer.mpber import MultiAgentBlockPrioritizedReplayBuffer
 
 
 logger = logging.getLogger(__name__)
@@ -124,11 +124,9 @@ def update_priorities_in_replay_buffer(
 
 class DDQNWithMPBER(DQN):
 
+    @override(SimpleQ)
     def _init(self, config: AlgorithmConfigDict, env_creator: EnvCreator) -> None:
         super(DDQNWithMPBER, self)._init(config, env_creator)
-
-    @override(SimpleQ)
-
 
     @override(SimpleQ)
     def training_step(self) -> ResultDict:
