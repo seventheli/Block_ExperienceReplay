@@ -22,23 +22,40 @@ parser.add_argument("-SBZ", "--sub_buffer_size", dest="sub_buffer_size", type=in
 
 with_er_logging = parser.parse_args().er_logging
 sub_buffer_size = parser.parse_args().sub_buffer_size
+
 # Config path
 settings = parser.parse_args().setting_path
 settings = Dynaconf(envvar_prefix="DYNACONF", settings_files=settings)
 
+# Set MLflow
+mlflow.set_tracking_uri(settings.mlflow.url)
+mlflow.set_experiment(experiment_name=settings.mlflow.experiment)
+mlflow_client = mlflow.tracking.MlflowClient()
+
 # Set hyper parameters
 hyper_parameters = settings.dqn.hyper_parameters.to_dict()
-mlflow.log_params({key: hyper_parameters[key] for key in hyper_parameters.keys() if key not in ["replay_buffer_config"]})
 if sub_buffer_size == 0:
-    mlflow.log_params(hyper_parameters["replay_buffer_config"])
+    # Set run object
     run_name = "DQN_ER_" + datetime.datetime.now().strftime("%Y%m%d")
+    mlflow_run = mlflow.start_run(run_name=run_name,
+                                  tags={"mlflow.user": settings.mlflow.user})
+    # Log parameters
+    mlflow.log_params(hyper_parameters["replay_buffer_config"])
+    mlflow.log_params({key: hyper_parameters[key] for key in hyper_parameters.keys() if key not in ["replay_buffer_config"]})
 else:
+    # Set run object
+    run_name = "DQN_BER_" + datetime.datetime.now().strftime("%Y%m%d")
+    mlflow_run = mlflow.start_run(run_name=run_name,
+                                  tags={"mlflow.user": settings.mlflow.user})
+    # Log parameters
+    env_example = wrap_deepmind(gym.make(settings.dqn.env))
     mlflow.log_params({
         **settings.dqn.hyper_parameters.replay_buffer_config.to_dict(),
         "type": "BlockReplayBuffer",
         "sub_buffer_size": sub_buffer_size,
     })
-    env_example = wrap_deepmind(gym.make(settings.dqn.env))
+    mlflow.log_params({key: hyper_parameters[key] for key in hyper_parameters.keys() if key not in ["replay_buffer_config"]})
+    # Set BER
     replay_buffer_config = {
         **settings.dqn.hyper_parameters.replay_buffer_config.to_dict(),
         "storage_unit": "fragments",
@@ -48,20 +65,11 @@ else:
         "sub_buffer_size": sub_buffer_size,
     }
     hyper_parameters["replay_buffer_config"] = replay_buffer_config
-    run_name = "DQN_BER_" + datetime.datetime.now().strftime("%Y%m%d")
 
 if with_er_logging:
     algorithm = DQNWithLogging(config=hyper_parameters, env=settings.dqn.env)
 else:
     algorithm = DQN(config=hyper_parameters, env=settings.dqn.env)
-
-# Set MLflow
-print(run_name)
-mlflow.set_tracking_uri(settings.mlflow.url)
-mlflow.set_experiment(experiment_name=settings.mlflow.experiment)
-mlflow_client = mlflow.tracking.MlflowClient()
-mlflow_run = mlflow.start_run(run_name=run_name,
-                              tags={"mlflow.user": settings.mlflow.user})
 
 # Check path available
 log_path = path.join(settings.log.save_file, settings.dqn.env)
@@ -69,6 +77,7 @@ check_path(log_path)
 log_path = path.join(log_path, run_name)
 check_path(log_path)
 
+# Run algorithms
 keys_to_extract = {"episode_reward_max", "episode_reward_min", "episode_reward_mean"}
 for i in tqdm.tqdm(range(1, 10000)):
     result = algorithm.train()
