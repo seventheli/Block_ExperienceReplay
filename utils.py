@@ -32,9 +32,9 @@ def log_with_timeout(client, run_id, key, value, step):
 
 
 @func_set_timeout(5)
-def logs_with_timeout(data):
+def logs_with_timeout(data, step):
     try:
-        mlflow.log_metrics(data)
+        mlflow.log_metrics(data, step)
     except:
         pass
 

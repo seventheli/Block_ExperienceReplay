@@ -1,0 +1,42 @@
+mlflow:
+  experiment: "Simple-SpaceInvadersNoFrameskip"
+  url: "http://127.0.0.1:9999"
+  user: "UD2"
+dqn:
+  env: SpaceInvadersNoFrameskip
+  run: DQN
+  hyper_parameters:
+    double_q: false
+    dueling: false
+    num_atoms: 1
+    noisy: false
+    n_step: 1
+    lr: .0000625
+    adam_epsilon: .00015
+    hiddens: [ 512 ]
+    num_steps_sampled_before_learning_starts: 20000
+    evaluation_duration_unit: "episodes"
+    evaluation_interval: 20
+    evaluation_num_workers: 2
+    evaluation_duration: 10
+    evaluation_parallel_to_training: true
+    # Extra
+    num_gpus: 1
+    framework: "torch"
+    # DQN
+    num_envs_per_worker: 1
+    num_gpus_per_worker: 0
+    sample_batch_size: 4
+    train_batch_size: 32
+    target_network_update_freq: 8000
+    min_sample_timesteps_per_iteration: 10000
+    replay_buffer_config:
+      type: 'ReplayBuffer'
+      capacity: 1000000
+log:
+  save_file: "/home/seventheli/logging/"
+  score: 20000
+  min_time: 180000
+  max_time: 216000
+  log: 5
+  save: 100
