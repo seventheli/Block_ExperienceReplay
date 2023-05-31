@@ -44,7 +44,7 @@ def update_priorities_in_replay_buffer(
     """
 
     # Only update priorities if buffer supports them.
-    if isinstance(MultiAgentPrioritizedBlockReplayBuffer):
+    if isinstance(replay_buffer, MultiAgentPrioritizedBlockReplayBuffer):
         # Go through training results for the different policies (maybe multi-agent).
         prio_dict = {}
         for policy_id, info in train_results.items():

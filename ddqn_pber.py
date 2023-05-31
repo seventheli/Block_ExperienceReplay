@@ -11,7 +11,6 @@ from algorithms.ddqn_pber import DDQNWithMPBER
 from replay_buffer.mpber import MultiAgentPrioritizedBlockReplayBuffer
 from ray.rllib.algorithms.dqn import DQN
 from ray.rllib.env.wrappers.atari_wrappers import wrap_deepmind
-
 checkpoint_path = "./checkpoint/"
 init_ray("./ray_config.yml")
 
@@ -51,7 +50,7 @@ else:
     env_example = wrap_deepmind(gym.make(settings.dqn.env))
     mlflow.log_params({
         **settings.dqn.hyper_parameters.replay_buffer_config.to_dict(),
-        "type": "BlockReplayBuffer",
+        "type": "MultiAgentBlockPrioritizedReplayBuffer",
         "sub_buffer_size": sub_buffer_size,
     })
     mlflow.log_params({key: hyper_parameters[key] for key in hyper_parameters.keys() if key not in ["replay_buffer_config"]})

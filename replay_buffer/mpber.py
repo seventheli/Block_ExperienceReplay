@@ -5,12 +5,12 @@ from typing import Dict
 from ray.rllib.utils.annotations import override, DeveloperAPI
 from ray.rllib.utils.replay_buffers.utils import SampleBatchType
 from ray.rllib.utils.replay_buffers.replay_buffer import ReplayBuffer
-from ray.rllib.utils.replay_buffers.multi_agent_replay_buffer import MultiAgentReplayBuffer, ReplayMode
+from ray.rllib.utils.replay_buffers.multi_agent_replay_buffer import ReplayMode
+from ray.rllib.utils.replay_buffers.multi_agent_prioritized_replay_buffer import MultiAgentPrioritizedReplayBuffer
 from ray.rllib.utils.replay_buffers.prioritized_replay_buffer import PrioritizedReplayBuffer
 from replay_buffer.replay_node import BaseBuffer
 from ray.rllib.utils.replay_buffers import StorageUnit
 from ray.util.debug import log_once
-from ray.util.timer import _Timer
 
 logger = logging.getLogger(__name__)
 
@@ -56,7 +56,7 @@ class PrioritizedBlockReplayBuffer(PrioritizedReplayBuffer):
 
 
 @DeveloperAPI
-class MultiAgentPrioritizedBlockReplayBuffer(MultiAgentReplayBuffer, PrioritizedBlockReplayBuffer):
+class MultiAgentPrioritizedBlockReplayBuffer(MultiAgentPrioritizedReplayBuffer):
     """A prioritized replay buffer shard for multiagent setups.
 
     This buffer is meant to be run in parallel to distribute experiences
@@ -69,17 +69,17 @@ class MultiAgentPrioritizedBlockReplayBuffer(MultiAgentReplayBuffer, Prioritized
             obs_space: Space,
             action_space: Space,
             sub_buffer_size: int = 1,
-            capacity: int = 10000,
-            num_shards: int = 1,
-            learning_starts: int = 1000,
             rollout_fragment_length: int = 4,
+            capacity: int = 10000,
+            storage_unit: str = "timesteps",
+            num_shards: int = 1,
             replay_mode: str = "independent",
             replay_sequence_override: bool = True,
             replay_sequence_length: int = 1,
             replay_burn_in: int = 0,
             replay_zero_init_states: bool = True,
             prioritized_replay_alpha: float = 0.6,
-            prioritized_replay_beta: float = 1.0,
+            prioritized_replay_beta: float = 0.4,
             prioritized_replay_eps: float = 1e-6,
             **kwargs
     ):
@@ -145,7 +145,7 @@ class MultiAgentPrioritizedBlockReplayBuffer(MultiAgentReplayBuffer, Prioritized
                     "This buffer will run in `independent` mode."
                 )
             kwargs["replay_mode"] = "independent"
-        prioritized_replay_buffer_config = {
+        pber_config = {
             "type": PrioritizedBlockReplayBuffer,
             "action_space": action_space,
             "obs_space": obs_space,
@@ -153,25 +153,25 @@ class MultiAgentPrioritizedBlockReplayBuffer(MultiAgentReplayBuffer, Prioritized
             "randomly": False,
             "sub_buffer_size": sub_buffer_size,
             "alpha": prioritized_replay_alpha,
-            "beta": prioritized_replay_beta
+            "beta": prioritized_replay_beta,
         }
-        MultiAgentReplayBuffer.__init__(
+        MultiAgentPrioritizedReplayBuffer.__init__(
             self,
             capacity=capacity,
+            storage_unit=storage_unit,
             num_shards=num_shards,
-            storage_unit=StorageUnit.FRAGMENTS,
-            replay_sequence_override=replay_sequence_override,
-            learning_starts=learning_starts,
             replay_mode=replay_mode,
+            replay_sequence_override=replay_sequence_override,
             replay_sequence_length=replay_sequence_length,
             replay_burn_in=replay_burn_in,
             replay_zero_init_states=replay_zero_init_states,
-            underlying_buffer_config=prioritized_replay_buffer_config,
+            underlying_buffer_config=pber_config,
+            prioritized_replay_alpha=prioritized_replay_alpha,
+            prioritized_replay_beta=prioritized_replay_beta,
+            prioritized_replay_eps=prioritized_replay_eps,
             **kwargs,
         )
         self.rollout_fragment_length = rollout_fragment_length
-        self.prioritized_replay_eps = prioritized_replay_eps
-        self.update_priorities_timer = _Timer()
 
     @DeveloperAPI
     @override(ReplayBuffer)
@@ -201,8 +201,11 @@ class MultiAgentPrioritizedBlockReplayBuffer(MultiAgentReplayBuffer, Prioritized
         with self.add_batch_timer:
             pids_and_batches = self._maybe_split_into_policy_batches(batch)
             for policy_id, sample_batch in pids_and_batches.items():
-                for s_batch in sample_batch.timeslices(self.rollout_fragment_length):
-                    self._add_to_underlying_buffer(policy_id, s_batch)
+                if len(sample_batch) == 1:
+                    self._add_to_underlying_buffer(policy_id, sample_batch)
+                else:
+                    for s_batch in sample_batch.timeslices(self.rollout_fragment_length):
+                        self._add_to_underlying_buffer(policy_id, s_batch)
 
         self._num_added += batch.count
 
