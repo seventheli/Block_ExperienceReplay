@@ -6,7 +6,7 @@ import collections
 from dynaconf import Dynaconf
 from train_with_statistics import train
 from utils import init_ray
-from algorithms.ray_apex_dqn_pber import APEXPolicyWithPBER
+from algorithms.apex_dqn_pber import APEXPolicyWithPBER
 from ray.rllib.algorithms.apex_dqn.apex_dqn import ApexDQNConfig
 from ray.rllib.env.wrappers.atari_wrappers import wrap_deepmind
 from replay_buffer.pber import MultiAgentBatchedPrioritizedReplayBuffer

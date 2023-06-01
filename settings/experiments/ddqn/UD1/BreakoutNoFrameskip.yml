@@ -31,8 +31,10 @@ dqn:
     target_network_update_freq: 8000
     min_sample_timesteps_per_iteration: 10000
     replay_buffer_config:
-      type: 'ReplayBuffer'
+      type: 'MultiAgentPrioritizedReplayBuffer'
       capacity: 1000000
+      prioritized_replay_beta: 1
+      prioritized_replay_alpha: 0.5
 log:
   save_file: "/home/seventheli/logging/"
   score: 400

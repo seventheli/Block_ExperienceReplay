@@ -4,10 +4,10 @@ from ray.rllib.utils.metrics import NUM_ENV_STEPS_TRAINED, NUM_AGENT_STEPS_TRAIN
 from ray.rllib.utils.typing import AlgorithmConfigDict
 
 
-class APEXPolicyWithPBER(ApexDQN):
+class ApexDQNWithDPBER(ApexDQN):
 
     def _init(self, config: AlgorithmConfigDict, env_creator: EnvCreator) -> None:
-        super(APEXPolicyWithPBER, self)._init(config, env_creator)
+        super(ApexDQNWithDPBER, self)._init(config, env_creator)
 
     def update_replay_sample_priority(self) -> None:
         """Update the priorities of the sample batches with new priorities that are
