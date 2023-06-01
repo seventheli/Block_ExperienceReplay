@@ -225,7 +225,6 @@ class MultiAgentPrioritizedBlockReplayBuffer(MultiAgentPrioritizedReplayBuffer):
         with self.update_priorities_timer:
             for policy_id, (batch_indexes, td_errors) in prio_dict.items():
                 new_priorities = np.abs(td_errors) + self.prioritized_replay_eps
-                print(batch_indexes, new_priorities)
                 self.replay_buffers[policy_id].update_priorities(
                     batch_indexes, new_priorities
                 )

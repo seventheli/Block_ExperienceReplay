@@ -14,17 +14,17 @@ from ray.rllib.utils.metrics.learner_info import LEARNER_STATS_KEY
 from ray.rllib.execution.common import LAST_TARGET_UPDATE_TS, NUM_TARGET_UPDATES
 from ray.rllib.utils.replay_buffers.utils import sample_min_n_steps_from_buffer
 from ray.rllib.algorithms.dqn.dqn import calculate_rr_weights
-from replay_buffer.mpber import MultiAgentBlockPrioritizedReplayBuffer
-
+from replay_buffer.mpber import MultiAgentPrioritizedBlockReplayBuffer
 
 logger = logging.getLogger(__name__)
 
+
 @DeveloperAPI
 def update_priorities_in_replay_buffer(
-    replay_buffer: MultiAgentBlockPrioritizedReplayBuffer,
-    config: AlgorithmConfigDict,
-    train_batch: SampleBatchType,
-    train_results: ResultDict,
+        replay_buffer: MultiAgentPrioritizedBlockReplayBuffer,
+        config: AlgorithmConfigDict,
+        train_batch: SampleBatchType,
+        train_results: ResultDict,
 ) -> None:
     """Updates the priorities in a prioritized replay buffer, given training results.
 
@@ -42,9 +42,8 @@ def update_priorities_in_replay_buffer(
             utility.
     """
 
-
     # Only update priorities if buffer supports them.
-    if isinstance(replay_buffer, MultiAgentBlockPrioritizedReplayBuffer):
+    if isinstance(replay_buffer, MultiAgentPrioritizedBlockReplayBuffer):
         # Go through training results for the different policies (maybe multi-agent).
         prio_dict = {}
         for policy_id, info in train_results.items():
@@ -80,7 +79,7 @@ def update_priorities_in_replay_buffer(
 
             if td_error is None:
                 if log_once(
-                    "no_td_error_in_train_results_from_policy_{}".format(policy_id)
+                        "no_td_error_in_train_results_from_policy_{}".format(policy_id)
                 ):
                     logger.warning(
                         "Trying to update priorities for policy with id `{}` in "
@@ -92,7 +91,7 @@ def update_priorities_in_replay_buffer(
 
             if batch_indices is None:
                 if log_once(
-                    "no_batch_indices_in_train_result_for_policy_{}".format(policy_id)
+                        "no_batch_indices_in_train_result_for_policy_{}".format(policy_id)
                 ):
                     logger.warning(
                         "Trying to update priorities for policy with id `{}` in "
@@ -106,7 +105,7 @@ def update_priorities_in_replay_buffer(
             if len(batch_indices) != len(td_error):
                 t = replay_buffer.replay_sequence_length
                 assert (
-                    len(batch_indices) > len(td_error) and len(batch_indices) % t == 0
+                        len(batch_indices) > len(td_error) and len(batch_indices) % t == 0
                 )
                 batch_indices = batch_indices.reshape([-1, t])[:, 0]
                 assert len(batch_indices) == len(td_error)
@@ -122,9 +121,9 @@ def update_priorities_in_replay_buffer(
         # policies.
         replay_buffer.update_priorities(prio_dict)
 
+
 class DDQNWithMPBER(DQN):
 
-    @override(SimpleQ)
     def _init(self, config: AlgorithmConfigDict, env_creator: EnvCreator) -> None:
         super(DDQNWithMPBER, self)._init(config, env_creator)
 
@@ -205,7 +204,6 @@ class DDQNWithMPBER(DQN):
                     train_batch,
                     train_results,
                 )
-
                 last_update = self._counters[LAST_TARGET_UPDATE_TS]
                 if cur_ts - last_update >= self.config.target_network_update_freq:
                     to_update = self.workers.local_worker().get_policies_to_train()
