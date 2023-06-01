@@ -1,12 +1,12 @@
 mlflow:
-  experiment: "Simple-BreakoutNoFrameskip"
-  url: "http://127.0.0.1:9999"
-  user: "UD2"
+  experiment: "Simple-Q*BertNoFrameskip"
+  url: "http://10.56.238.20:9999"
+  user: "UD1"
 dqn:
-  env: BreakoutNoFrameskip
+  env: SpaceInvadersNoFrameskip
   run: DQN
   hyper_parameters:
-    double_q: false
+    double_q: true
     dueling: false
     num_atoms: 1
     noisy: false
@@ -35,7 +35,7 @@ dqn:
       capacity: 1000000
 log:
   save_file: "/home/seventheli/logging/"
-  score: 400
+  score: 20000
   min_time: 180000
   max_time: 216000
   log: 5

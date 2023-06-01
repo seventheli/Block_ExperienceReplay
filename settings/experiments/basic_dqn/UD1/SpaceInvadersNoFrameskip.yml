@@ -1,7 +1,7 @@
 mlflow:
   experiment: "Simple-SpaceInvadersNoFrameskip"
-  url: "http://127.0.0.1:9999"
-  user: "UD2"
+  url: "http://10.56.238.20:9999"
+  user: "UD1"
 dqn:
   env: SpaceInvadersNoFrameskip
   run: DQN

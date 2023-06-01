@@ -1,9 +1,9 @@
 mlflow:
-  experiment: "Simple-BeamRiderNoFrameskip"
-  url: "http://127.0.0.1:9999"
+  experiment: "Simple-Q*BertNoFrameskip"
+  url: "http://10.56.238.20:9999"
   user: "UD1"
 dqn:
-  env: BeamRiderNoFrameskip
+  env: BreakoutNoFrameskip
   run: DQN
   hyper_parameters:
     double_q: true
@@ -35,7 +35,7 @@ dqn:
       capacity: 1000000
 log:
   save_file: "/home/seventheli/logging/"
-  score: 15000
+  score: 400
   min_time: 180000
   max_time: 216000
   log: 5

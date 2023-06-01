@@ -1,7 +1,7 @@
 mlflow:
   experiment: "PhoenixNoFrameskip"
   url: "http://127.0.0.1:9999"
-  user: "UD1"
+  user: "UD2"
 dqn:
   env: PhoenixNoFrameskip-v4
   run: DQN
