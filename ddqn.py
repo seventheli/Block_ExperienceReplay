@@ -6,11 +6,14 @@ import argparse
 import datetime
 from os import path
 from dynaconf import Dynaconf
-from utils import init_ray, check_path, logs_with_timeout, convert_np_arrays
+from ray.rllib.algorithms.dqn import DQN
+from algorithms_with_statistics.ddqn_pber import DDQNWithMPBERAndLogging
+from algorithms_with_statistics.ddqn_per import DDQNWithMPERAndLogging
 from algorithms.ddqn_pber import DDQNWithMPBER
 from replay_buffer.mpber import MultiAgentPrioritizedBlockReplayBuffer
-from ray.rllib.algorithms.dqn import DQN
 from ray.rllib.env.wrappers.atari_wrappers import wrap_deepmind
+from utils import init_ray, check_path, logs_with_timeout, convert_np_arrays
+
 checkpoint_path = "./checkpoint/"
 init_ray("./ray_config.yml")
 
@@ -35,12 +38,16 @@ mlflow_client = mlflow.tracking.MlflowClient()
 hyper_parameters = settings.dqn.hyper_parameters.to_dict()
 if sub_buffer_size == 0:
     # Set run object
-    run_name = "DQN_PER_" + datetime.datetime.now().strftime("%Y%m%d")
+    run_name = "DDQN_PER_" + datetime.datetime.now().strftime("%Y%m%d")
     mlflow_run = mlflow.start_run(run_name=run_name,
                                   tags={"mlflow.user": settings.mlflow.user})
     # Log parameters
     mlflow.log_params(hyper_parameters["replay_buffer_config"])
     mlflow.log_params({key: hyper_parameters[key] for key in hyper_parameters.keys() if key not in ["replay_buffer_config"]})
+    if with_er_logging:
+        algorithm = DDQNWithMPERAndLogging(config=hyper_parameters, env=settings.dqn.env)
+    else:
+        algorithm = DQN(config=hyper_parameters, env=settings.dqn.env)
 else:
     # Set run object
     run_name = "DQN_PBER_" + datetime.datetime.now().strftime("%Y%m%d")
@@ -50,25 +57,25 @@ else:
     env_example = wrap_deepmind(gym.make(settings.dqn.env))
     mlflow.log_params({
         **settings.dqn.hyper_parameters.replay_buffer_config.to_dict(),
-        "type": "MultiAgentBlockPrioritizedReplayBuffer",
+        "type": "BlockReplayBuffer",
         "sub_buffer_size": sub_buffer_size,
     })
     mlflow.log_params({key: hyper_parameters[key] for key in hyper_parameters.keys() if key not in ["replay_buffer_config"]})
     # Set BER
     replay_buffer_config = {
         **settings.dqn.hyper_parameters.replay_buffer_config.to_dict(),
-        "storage_unit": "fragments",
         "type": MultiAgentPrioritizedBlockReplayBuffer,
         "obs_space": env_example.observation_space,
         "action_space": env_example.action_space,
         "sub_buffer_size": sub_buffer_size,
+        "worker_side_prioritization": False,
+        "replay_sequence_length": 1,
     }
     hyper_parameters["replay_buffer_config"] = replay_buffer_config
-
-if with_er_logging:
-    algorithm = DDQNWithMPBER(config=hyper_parameters, env=settings.dqn.env)
-else:
-    algorithm = DQN(config=hyper_parameters, env=settings.dqn.env)
+    if with_er_logging:
+        algorithm = DDQNWithMPBERAndLogging(config=hyper_parameters, env=settings.dqn.env)
+    else:
+        algorithm = DDQNWithMPBER(config=hyper_parameters, env=settings.dqn.env)
 
 # Check path available
 log_path = path.join(settings.log.save_file, settings.dqn.env)

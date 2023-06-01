@@ -21,7 +21,7 @@ settings = Dynaconf(envvar_prefix="DYNACONF", settings_files=setting_path)
 # Attributes
 batch_size = parser.parse_args().batch_size
 if batch_size != 0:
-    settings["apex"]["hyper_parameters"]["train_batch_size"] = batch_size
+    settings["_apex"]["hyper_parameters"]["train_batch_size"] = batch_size
 
 # Set mlflow
 mlflow.set_tracking_uri(settings.mlflow.url)
