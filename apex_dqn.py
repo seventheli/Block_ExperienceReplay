@@ -68,7 +68,7 @@ else:
     }
     hyper_parameters["replay_buffer_config"] = replay_buffer_config
     hyper_parameters["train_batch_size"] = int(hyper_parameters["train_batch_size"] / sub_buffer_size)
-    algorithm = ApexDDQNWithDPBER(config=hyper_parameters, env=settings.apexg.env)
+    algorithm = ApexDDQNWithDPBER(config=hyper_parameters, env=settings.apex.env)
 
 # Check path available
 log_path = path.join(settings.log.save_file, settings.apex.env)
