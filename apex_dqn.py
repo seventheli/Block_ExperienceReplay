@@ -21,7 +21,6 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-S", "--setting", dest="setting_path", type=str)
 parser.add_argument("-SBZ", "--sub_buffer_size", dest="sub_buffer_size", type=int, default=0)
 
-with_er_logging = parser.parse_args().er_logging
 sub_buffer_size = parser.parse_args().sub_buffer_size
 
 # Config path
