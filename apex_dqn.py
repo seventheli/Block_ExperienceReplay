@@ -58,6 +58,7 @@ else:
     replay_buffer_config = {
         **settings.apex.hyper_parameters.replay_buffer_config.to_dict(),
         "type": MultiAgentPrioritizedBlockReplayBuffer,
+        "capacity": int(settings.apex.hyper_parameters.replay_buffer_config.capacity / sub_buffer_size),
         "obs_space": env_example.observation_space,
         "action_space": env_example.action_space,
         "sub_buffer_size": sub_buffer_size,
@@ -67,7 +68,7 @@ else:
     }
     hyper_parameters["replay_buffer_config"] = replay_buffer_config
     hyper_parameters["train_batch_size"] = int(hyper_parameters["train_batch_size"] / sub_buffer_size)
-    algorithm = ApexDDQNWithDPBER(config=hyper_parameters, env=settings.apex.env)
+    algorithm = ApexDDQNWithDPBER(config=hyper_parameters, env=settings.apexg.env)
 
 # Check path available
 log_path = path.join(settings.log.save_file, settings.apex.env)
