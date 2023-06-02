@@ -36,7 +36,5 @@ dqn:
 log:
   save_file: "/home/seventheli/logging/"
   score: 400
-  min_time: 180000
   max_time: 216000
   log: 5
-  save: 100

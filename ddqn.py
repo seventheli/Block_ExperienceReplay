@@ -1,7 +1,9 @@
+import os
 import gym
 import tqdm
 import json
 import mlflow
+import zipfile
 import argparse
 import datetime
 from os import path
@@ -57,7 +59,7 @@ else:
     env_example = wrap_deepmind(gym.make(settings.dqn.env))
     mlflow.log_params({
         **settings.dqn.hyper_parameters.replay_buffer_config.to_dict(),
-        "type": "BlockReplayBuffer",
+        "type": "MultiAgentPrioritizedBlockReplayBuffer",
         "sub_buffer_size": sub_buffer_size,
     })
     mlflow.log_params({key: hyper_parameters[key] for key in hyper_parameters.keys() if key not in ["replay_buffer_config"]})
@@ -87,6 +89,7 @@ check_path(log_path)
 keys_to_extract = {"episode_reward_max", "episode_reward_min", "episode_reward_mean"}
 for i in tqdm.tqdm(range(1, 10000)):
     result = algorithm.train()
+    time_used = result["time_total_s"]
     # statistics
     evaluation = result.get("evaluation", None)
     sampler = result.get("sampler_results", None)
@@ -104,3 +107,9 @@ for i in tqdm.tqdm(range(1, 10000)):
     with open(path.join(log_path, str(i) + ".json"), "w") as f:
         result["config"] = None
         json.dump(convert_np_arrays(result), f)
+    if i >= 10 and (time_used >= settings.log.max_time or result["episode_reward_mean"] > settings.log.score):
+        break
+with zipfile.ZipFile(os.path.join(algorithm.logdir, '%s.zip' % run_name), 'w') as f:
+    for file in os.listdir(log_path):
+        f.write(os.path.join(log_path, file))
+mlflow.log_artifacts(algorithm.logdir)

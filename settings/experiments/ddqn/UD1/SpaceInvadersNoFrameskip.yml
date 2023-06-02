@@ -1,5 +1,5 @@
 mlflow:
-  experiment: "Simple-Q*BertNoFrameskip"
+  experiment: "Simple-SpaceInvadersNoFrameskip"
   url: "http://10.56.238.20:9999"
   user: "UD1"
 dqn:
@@ -15,6 +15,7 @@ dqn:
     adam_epsilon: .00015
     hiddens: [ 512 ]
     num_steps_sampled_before_learning_starts: 20000
+    schedule_max_timesteps: 2000000
     evaluation_duration_unit: "episodes"
     evaluation_interval: 20
     evaluation_num_workers: 2
@@ -38,7 +39,5 @@ dqn:
 log:
   save_file: "/home/seventheli/logging/"
   score: 20000
-  min_time: 180000
   max_time: 216000
   log: 5
-  save: 100

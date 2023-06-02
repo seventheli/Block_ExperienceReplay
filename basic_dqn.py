@@ -1,7 +1,9 @@
+import os
 import gym
 import tqdm
 import json
 import mlflow
+import zipfile
 import argparse
 import datetime
 from os import path
@@ -78,9 +80,11 @@ log_path = path.join(log_path, run_name)
 check_path(log_path)
 
 # Run algorithms
+# Run algorithms
 keys_to_extract = {"episode_reward_max", "episode_reward_min", "episode_reward_mean"}
 for i in tqdm.tqdm(range(1, 10000)):
     result = algorithm.train()
+    time_used = result["time_total_s"]
     # statistics
     evaluation = result.get("evaluation", None)
     sampler = result.get("sampler_results", None)
@@ -98,3 +102,10 @@ for i in tqdm.tqdm(range(1, 10000)):
     with open(path.join(log_path, str(i) + ".json"), "w") as f:
         result["config"] = None
         json.dump(convert_np_arrays(result), f)
+    if time_used >= settings.log.max_time:
+        break
+with zipfile.ZipFile(os.path.join(algorithm.logdir, '%s.zip' % run_name), 'w') as f:
+    for file in os.listdir(log_path):
+        f.write(os.path.join(log_path, file))
+mlflow.log_artifacts(algorithm.logdir)
+

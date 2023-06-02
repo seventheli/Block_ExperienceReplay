@@ -1,9 +1,9 @@
 mlflow:
-  experiment: "Simple-BreakoutNoFrameskip"
-  url: "http://10.56.238.20:9999"
-  user: "UD1"
+  experiment: "Simple-BeamRiderNoFrameskip"
+  url: "http://127.0.0.1:9999"
+  user: "UD2"
 apex:
-  env: BreakoutNoFrameskip
+  env: BeamRiderNoFrameskip
   run: APEX
   hyper_parameters:
     double_q: true
@@ -33,6 +33,6 @@ apex:
       prioritized_replay_alpha: 0.5
 log:
   save_file: "/home/seventheli/logging/"
-  score: 400
+  score: 15000
   max_time: 216000
   log: 5
