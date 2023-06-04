@@ -15,6 +15,8 @@ from algorithms.ddqn_pber import DDQNWithMPBER
 from replay_buffer.mpber import MultiAgentPrioritizedBlockReplayBuffer
 from ray.rllib.env.wrappers.atari_wrappers import wrap_deepmind
 from utils import init_ray, check_path, logs_with_timeout, convert_np_arrays
+from mlflow.exceptions import MlflowException
+from func_timeout import FunctionTimedOut
 
 checkpoint_path = "./checkpoint/"
 init_ray("./ray_config.yml")
@@ -93,17 +95,22 @@ for i in tqdm.tqdm(range(1, 10000)):
     # statistics
     evaluation = result.get("evaluation", None)
     sampler = result.get("sampler_results", None)
-    if i >= 10 or i % settings.log.log == 0:
-        learner_data = result["info"].copy()
-        if learner_data["learner"].get("time_usage", None) is not None:
-            logs_with_timeout(learner_data["learner"].get("time_usage"), step=result["episodes_total"])
-        learner_data.pop("learner")
-        logs_with_timeout(learner_data, step=result["episodes_total"])
-        _save = {key: sampler[key] for key in keys_to_extract if key in sampler}
-        logs_with_timeout(_save, step=result["episodes_total"])
-    if evaluation is not None:
-        _save = {"eval_" + key: evaluation[key] for key in keys_to_extract if key in evaluation}
-        logs_with_timeout(_save, step=result["episodes_total"])
+    try:
+        if evaluation is not None:
+            _save = {"eval_" + key: evaluation[key] for key in keys_to_extract if key in evaluation}
+            logs_with_timeout(_save, step=result["episodes_total"])
+        if i >= 10 or i % settings.log.log == 0:
+            learner_data = result["info"].copy()
+            if learner_data["learner"].get("time_usage", None) is not None:
+                logs_with_timeout(learner_data["learner"].get("time_usage"), step=result["episodes_total"])
+            learner_data.pop("learner")
+            logs_with_timeout(learner_data, step=result["episodes_total"])
+            _save = {key: sampler[key] for key in keys_to_extract if key in sampler}
+            logs_with_timeout(_save, step=result["episodes_total"])
+    except FunctionTimedOut:
+        tqdm.tqdm.write("logging failed")
+    except MlflowException:
+        tqdm.tqdm.write("logging failed")
     with open(path.join(log_path, str(i) + ".json"), "w") as f:
         result["config"] = None
         json.dump(convert_np_arrays(result), f)
