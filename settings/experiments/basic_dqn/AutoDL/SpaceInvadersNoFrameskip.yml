@@ -34,7 +34,7 @@ dqn:
       type: 'ReplayBuffer'
       capacity: 1000000
 log:
-  save_file: "/home/seventheli/logging/"
+  save_file: "/root/autodl-tmp/logging/"
   score: 30000
   max_time: 720000
   log: 5
