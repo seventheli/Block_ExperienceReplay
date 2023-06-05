@@ -1,6 +1,6 @@
 mlflow:
   experiment: "Simple-SpaceInvadersNoFrameskip"
-  url: "http://10.56.238.20:9999"
+  url: "https://seventheli-mlflow.eu.cpolar.io/"
   user: "UD1"
 dqn:
   env: SpaceInvadersNoFrameskip
