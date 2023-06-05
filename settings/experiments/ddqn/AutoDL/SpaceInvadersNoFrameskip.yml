@@ -38,6 +38,6 @@ dqn:
       prioritized_replay_alpha: 0.5
 log:
   save_file: "/home/seventheli/logging/"
-  score: 20000
-  max_time: 216000
+  score: 30000
+  max_time: 720000
   log: 5
