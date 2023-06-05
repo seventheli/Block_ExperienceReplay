@@ -60,7 +60,7 @@ else:
     replay_buffer_config = {
         **settings.apex.hyper_parameters.replay_buffer_config.to_dict(),
         "type": MultiAgentPrioritizedBlockReplayBuffer,
-        "capacity": int(settings.apex.hyper_parameters.replay_buffer_config.capacity / sub_buffer_size),
+        "capacity": int(settings.apex.hyper_parameters.replay_buffer_config.capacity),
         "obs_space": env_example.observation_space,
         "action_space": env_example.action_space,
         "sub_buffer_size": sub_buffer_size,
