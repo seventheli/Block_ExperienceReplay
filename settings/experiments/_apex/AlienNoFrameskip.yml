@@ -33,6 +33,6 @@ apex:
 control:
   score: 7536
   min_time: 144000
-  max_time: 216000
+  max_time: 720000
   log: 1
   save: 100

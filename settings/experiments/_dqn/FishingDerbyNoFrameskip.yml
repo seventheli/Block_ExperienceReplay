@@ -33,6 +33,6 @@ dqn:
 control:
   score: 45
   min_time: 144000
-  max_time: 216000
+  max_time: 720000
   log: 5
   save: 100
