@@ -1,6 +1,6 @@
 mlflow:
   experiment: "Simple-BreakoutNoFrameskip"
-  url: "http://10.70.32.49:9999"
+  url: "http://10.56.238.20:9999"
   user: "UD1"
 apex:
   env: BreakoutNoFrameskip
