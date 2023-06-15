@@ -27,6 +27,7 @@ dqn:
     # DQN
     num_envs_per_worker: 1
     num_gpus_per_worker: 0
+    num_cpus_per_worker: 1
     sample_batch_size: 4
     train_batch_size: 32
     target_network_update_freq: 8000
