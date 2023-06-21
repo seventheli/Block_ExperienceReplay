@@ -1,7 +1,7 @@
 mlflow:
   experiment: "Simple-SpaceInvadersNoFrameskip"
   url: "https://seventheli-mlflow.eu.cpolar.io/"
-  user: "UD1"
+  user: "AutoDL"
 apex:
   env: SpaceInvadersNoFrameskip
   run: APEX
@@ -25,7 +25,7 @@ apex:
     # APEX
     num_workers: 8
     num_envs_per_worker: 8
-    num_gpus_per_worker: 0
+    num_gpus_per_worker: 0.1
     sample_batch_size: 20
     train_batch_size: 512
     target_network_update_freq: 50000

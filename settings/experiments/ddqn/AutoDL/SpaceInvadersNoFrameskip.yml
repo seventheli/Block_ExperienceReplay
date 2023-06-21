@@ -1,7 +1,7 @@
 mlflow:
   experiment: "Simple-SpaceInvadersNoFrameskip"
   url: "https://seventheli-mlflow.eu.cpolar.io/"
-  user: "UD1"
+  user: "AutoDL"
 dqn:
   env: SpaceInvadersNoFrameskip
   run: DQN
@@ -15,7 +15,6 @@ dqn:
     adam_epsilon: .00015
     hiddens: [ 512 ]
     num_steps_sampled_before_learning_starts: 20000
-    schedule_max_timesteps: 2000000
     evaluation_duration_unit: "episodes"
     evaluation_interval: 20
     evaluation_num_workers: 1
@@ -28,7 +27,7 @@ dqn:
     framework: "torch"
     # DQN
     num_envs_per_worker: 1
-    num_gpus_per_worker: 0
+    num_gpus_per_worker: 0.1
     num_cpus_per_worker: 1
     sample_batch_size: 4
     train_batch_size: 32
