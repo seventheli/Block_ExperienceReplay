@@ -20,6 +20,8 @@ dqn:
     evaluation_num_workers: 2
     evaluation_duration: 100
     evaluation_parallel_to_training: true
+    exploration_config:
+      final_epsilon: 0.01
     # Extra
     num_gpus: 1
     framework: "torch"
