@@ -19,7 +19,7 @@ apex:
     framework: "torch"
     evaluation_duration_unit: "episodes"
     evaluation_interval: 20
-    evaluation_num_workers: 2
+    evaluation_num_workers: 1
     evaluation_duration: 100
     evaluation_parallel_to_training: true
     # APEX

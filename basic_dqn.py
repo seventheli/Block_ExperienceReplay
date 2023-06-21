@@ -82,7 +82,6 @@ log_path = path.join(log_path, run_name)
 check_path(log_path)
 
 # Run algorithms
-# Run algorithms
 keys_to_extract = {"episode_reward_max", "episode_reward_min", "episode_reward_mean"}
 for i in tqdm.tqdm(range(1, 10000)):
     result = algorithm.train()
