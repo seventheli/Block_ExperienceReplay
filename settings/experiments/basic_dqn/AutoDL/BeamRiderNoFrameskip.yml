@@ -1,0 +1,43 @@
+mlflow:
+  experiment: "Simple-BeamRiderNoFrameskip"
+  url: "https://seventheli-mlflow.eu.cpolar.io/"
+  user: "AutoDL"
+dqn:
+  env: BeamRiderNoFrameskip
+  run: DQN
+  hyper_parameters:
+    double_q: false
+    dueling: false
+    num_atoms: 1
+    noisy: false
+    n_step: 1
+    lr: .0000625
+    adam_epsilon: .00015
+    hiddens: [ 512 ]
+    num_steps_sampled_before_learning_starts: 20000
+    evaluation_duration_unit: "episodes"
+    evaluation_interval: 20
+    evaluation_num_workers: 1
+    evaluation_duration: 100
+    evaluation_parallel_to_training: true
+    exploration_config:
+      final_epsilon: 0.01
+    # Extra
+    num_gpus: 1
+    framework: "torch"
+    # DQN
+    num_envs_per_worker: 1
+    num_gpus_per_worker: 0.2
+    num_cpus_per_worker: 1
+    sample_batch_size: 4
+    train_batch_size: 32
+    target_network_update_freq: 8000
+    min_sample_timesteps_per_iteration: 10000
+    replay_buffer_config:
+      type: 'ReplayBuffer'
+      capacity: 1000000
+log:
+  save_file: "/root/autodl-tmp/logging/"
+  score: 30000
+  max_time: 720000
+  log: 5
