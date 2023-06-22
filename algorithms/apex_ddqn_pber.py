@@ -28,7 +28,7 @@ class ApexDDQNWithDPBER(ApexDQN):
                     batch_indices = priority_dict[i][0].reshape(-1, sub_buffer_size)[:, 0]
                     td_error = priority_dict[i][1].reshape([-1, sub_buffer_size]).mean(axis=1)
                     priority_dict[i] = (batch_indices, td_error)
-                if self.config.replay_buffer_config.get("prioritized_replay_alpha") > 0:
+                if self.config["replay_buffer_config"].get("prioritized_replay_alpha") > 0:
                     self._replay_actor_manager.foreach_actor(
                         func=lambda actor: actor.update_priorities(priority_dict),
                         remote_actor_ids=[replay_actor_id],

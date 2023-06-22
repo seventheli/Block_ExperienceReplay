@@ -28,6 +28,7 @@ apex:
     num_gpus_per_worker: 0
     sample_batch_size: 20
     train_batch_size: 512
+    rollout_fragment_length: 20
     target_network_update_freq: 50000
     min_sample_timesteps_per_iteration: 25000
     replay_buffer_config:
@@ -37,6 +38,7 @@ apex:
       prioritized_replay_alpha: 0.5
 log:
   save_file: "/home/seventheli/logging/"
+  save_checkout: "/home/seventheli/checkpoints/"
   score: 20000
   max_time: 720000
   log: 5

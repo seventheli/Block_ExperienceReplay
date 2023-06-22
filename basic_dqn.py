@@ -101,6 +101,8 @@ for i in tqdm.tqdm(range(1, 10000)):
             logs_with_timeout(learner_data, step=result["episodes_total"])
             _save = {key: sampler[key] for key in keys_to_extract if key in sampler}
             logs_with_timeout(_save, step=result["episodes_total"])
+        if  i % (settings.log.log * 100) == 0:
+            algorithm.save_checkpoint(settings.log.save_checkout)
     except FunctionTimedOut:
         tqdm.tqdm.write("logging failed")
     except MlflowException:

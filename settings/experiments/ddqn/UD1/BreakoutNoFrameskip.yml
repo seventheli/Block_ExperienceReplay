@@ -39,6 +39,7 @@ dqn:
       prioritized_replay_alpha: 0.5
 log:
   save_file: "/home/seventheli/logging/"
+  save_checkout: "/home/seventheli/checkpoints/"
   score: 400
   max_time: 720000
   log: 5
