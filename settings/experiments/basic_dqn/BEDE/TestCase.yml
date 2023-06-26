@@ -1,9 +1,5 @@
-mlflow:
-  experiment: "Simple-Q*BertNoFrameskip"
-  url: "http://127.0.0.1:9999"
-  user: "UD2"
 dqn:
-  env: QbertNoFrameskip
+  env: BreakoutNoFrameskip
   run: DQN
   hyper_parameters:
     double_q: false
@@ -18,9 +14,8 @@ dqn:
     evaluation_duration_unit: "episodes"
     evaluation_interval: 20
     evaluation_num_workers: 1
-    evaluation_duration: 1000
+    evaluation_duration: 100
     evaluation_parallel_to_training: true
-    enable_async_evaluation: true
     exploration_config:
       final_epsilon: 0.01
     # Extra
@@ -37,8 +32,7 @@ dqn:
       type: 'ReplayBuffer'
       capacity: 1000000
 log:
-  save_file: "/home/seventheli/logging/"
-  save_checkout: "/home/seventheli/checkpoints/"
-  score: 20000
+  save_file: "/nobackup/projects/bdncl15/b5048266/loggings"
+  save_checkout: "/nobackup/projects/bdncl15/b5048266/checkpoints"
+  score: 400
   max_time: 720000
-  log: 5
