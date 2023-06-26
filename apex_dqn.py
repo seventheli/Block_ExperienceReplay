@@ -73,11 +73,11 @@ else:
     hyper_parameters["train_batch_size"] = int(hyper_parameters["train_batch_size"] / sub_buffer_size)
     algorithm = ApexDDQNWithDPBER(config=hyper_parameters, env=settings.apex.env)
 
-with open(algorithm.logdir + "%s config.pyl" %run_name, "wb") as f:
+with open(settings.log.save_checkout + "%s config.pyl" %run_name, "wb") as f:
     _ = algorithm.config.to_dict()
     _.pop("multiagent")
     pickle.dump(_, f)
-mlflow.log_artifacts(algorithm.logdir)
+mlflow.log_artifacts(settings.log.save_checkout)
 
 # Check path available
 log_path = path.join(settings.log.save_file, settings.apex.env)
@@ -114,7 +114,7 @@ for i in tqdm.tqdm(range(1, 10000)):
         json.dump(convert_np_arrays(result), f)
     if time_used >= settings.log.max_time:
         break
-with zipfile.ZipFile(os.path.join(algorithm.logdir, '%s.zip' % run_name), 'w') as f:
+with zipfile.ZipFile(os.path.join(settings.log.save_checkout, '%s.zip' % run_name), 'w') as f:
     for file in os.listdir(log_path):
         f.write(os.path.join(log_path, file))
-mlflow.log_artifacts(algorithm.logdir)
+mlflow.log_artifacts(settings.log.save_checkout)
