@@ -19,7 +19,7 @@ dqn:
     evaluation_duration_unit: "episodes"
     evaluation_interval: 10
     evaluation_num_workers: 1
-    evaluation_duration: 1000
+    evaluation_duration: 500
     evaluation_parallel_to_training: true
     enable_async_evaluation: true
     exploration_config:
