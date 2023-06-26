@@ -3,6 +3,7 @@ import gym
 import tqdm
 import json
 import mlflow
+import pickle
 import zipfile
 import argparse
 import datetime
@@ -71,6 +72,12 @@ else:
     hyper_parameters["replay_buffer_config"] = replay_buffer_config
     hyper_parameters["train_batch_size"] = int(hyper_parameters["train_batch_size"] / sub_buffer_size)
     algorithm = ApexDDQNWithDPBER(config=hyper_parameters, env=settings.apex.env)
+
+with open(algorithm.logdir + "%s config.pyl" %run_name, "wb") as f:
+    _ = algorithm.config.to_dict()
+    _.pop("multiagent")
+    pickle.dump(_, f)
+mlflow.log_artifacts(algorithm.logdir)
 
 # Check path available
 log_path = path.join(settings.log.save_file, settings.apex.env)

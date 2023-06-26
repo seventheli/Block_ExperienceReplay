@@ -3,6 +3,7 @@ import gym
 import tqdm
 import json
 import mlflow
+import pickle
 import zipfile
 import argparse
 import datetime
@@ -80,6 +81,12 @@ else:
         algorithm = DDQNWithMPBERAndLogging(config=hyper_parameters, env=settings.dqn.env)
     else:
         algorithm = DDQNWithMPBER(config=hyper_parameters, env=settings.dqn.env)
+
+with open(algorithm.logdir + "%s config.pyl" %run_name, "wb") as f:
+    _ = algorithm.config.to_dict()
+    _.pop("multiagent")
+    pickle.dump(_, f)
+mlflow.log_artifacts(algorithm.logdir)
 
 # Check path available
 log_path = path.join(settings.log.save_file, settings.dqn.env)

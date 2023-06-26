@@ -3,6 +3,7 @@ import gym
 import tqdm
 import json
 import mlflow
+import pickle
 import zipfile
 import argparse
 import datetime
@@ -75,6 +76,12 @@ if with_er_logging:
 else:
     algorithm = DQN(config=hyper_parameters, env=settings.dqn.env)
 
+with open(algorithm.logdir + "%s config.pyl" %run_name, "wb") as f:
+    _ = algorithm.config.to_dict()
+    _.pop("multiagent")
+    pickle.dump(_, f)
+mlflow.log_artifacts(algorithm.logdir)
+
 # Check path available
 log_path = path.join(settings.log.save_file, settings.dqn.env)
 check_path(log_path)
@@ -101,7 +108,7 @@ for i in tqdm.tqdm(range(1, 10000)):
             logs_with_timeout(learner_data, step=result["episodes_total"])
             _save = {key: sampler[key] for key in keys_to_extract if key in sampler}
             logs_with_timeout(_save, step=result["episodes_total"])
-        if  i % (settings.log.log * 100) == 0:
+        if i % (settings.log.log * 100) == 0:
             algorithm.save_checkpoint(settings.log.save_checkout)
     except FunctionTimedOut:
         tqdm.tqdm.write("logging failed")
@@ -116,4 +123,3 @@ with zipfile.ZipFile(os.path.join(algorithm.logdir, '%s.zip' % run_name), 'w') a
     for file in os.listdir(log_path):
         f.write(os.path.join(log_path, file))
 mlflow.log_artifacts(algorithm.logdir)
-
