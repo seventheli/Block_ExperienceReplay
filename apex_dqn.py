@@ -84,6 +84,10 @@ log_path = path.join(settings.log.save_file, settings.apex.env)
 check_path(log_path)
 log_path = path.join(log_path, run_name)
 check_path(log_path)
+checkout_path = path.join(settings.log.save_checkout, settings.apex.env)
+check_path(checkout_path)
+checkout_path = path.join(checkout_path, run_name)
+check_path(checkout_path)
 
 # Run algorithms
 keys_to_extract = {"episode_reward_max", "episode_reward_min", "episode_reward_mean"}
