@@ -23,7 +23,6 @@ dqn:
     evaluation_parallel_to_training: true
     enable_async_evaluation: true
     exploration_config:
-      num_envs_per_worker: 10
       final_epsilon: 0.01
     # Extra
     num_gpus: 1
