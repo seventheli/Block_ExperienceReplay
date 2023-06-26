@@ -15,13 +15,15 @@ dqn:
     adam_epsilon: .00015
     hiddens: [ 512 ]
     num_steps_sampled_before_learning_starts: 20000
+    always_attach_evaluation_results: true
     evaluation_duration_unit: "episodes"
-    evaluation_interval: 20
+    evaluation_interval: 10
     evaluation_num_workers: 1
-    evaluation_duration: 1000
+    evaluation_duration: 200
     evaluation_parallel_to_training: true
     enable_async_evaluation: true
     exploration_config:
+      num_envs_per_worker: 10
       final_epsilon: 0.01
     # Extra
     num_gpus: 1
