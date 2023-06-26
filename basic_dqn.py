@@ -83,11 +83,11 @@ with open(settings.log.save_checkout + "%s config.pyl" %run_name, "wb") as f:
 mlflow.log_artifacts(settings.log.save_checkout)
 
 # Check path available
-log_path = path.join(settings.log.save_file, settings.apex.env)
+log_path = path.join(settings.log.save_file, settings.dqn.env)
 check_path(log_path)
 log_path = path.join(log_path, run_name)
 check_path(log_path)
-checkout_path = path.join(settings.log.save_checkout, settings.apex.env)
+checkout_path = path.join(settings.log.save_checkout, settings.dqn.env)
 check_path(checkout_path)
 checkout_path = path.join(checkout_path, run_name)
 check_path(checkout_path)
