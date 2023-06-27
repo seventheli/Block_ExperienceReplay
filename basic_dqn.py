@@ -17,6 +17,9 @@ from utils import init_ray, check_path, logs_with_timeout, convert_np_arrays
 from mlflow.exceptions import MlflowException
 from func_timeout import FunctionTimedOut
 
+
+from ray.rllib.train import load_experiments_from_file
+
 checkpoint_path = "./checkpoint/"
 init_ray("./ray_config.yml")
 
