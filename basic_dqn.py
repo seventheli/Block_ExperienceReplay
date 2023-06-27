@@ -123,7 +123,7 @@ for i in tqdm.tqdm(range(1, 10000)):
         json.dump(convert_np_arrays(result), f)
     if time_used >= settings.log.max_time:
         break
-with zipfile.ZipFile(os.path.join(checkpoint_path, '%s.zip' % run_name), 'w') as f:
+with zipfile.ZipFile(os.path.join(checkpoint_path, '%s_log.zip' % run_name), 'w') as f:
     for file in os.listdir(log_path):
         f.write(os.path.join(log_path, file))
-mlflow.log_artifacts(checkpoint_path)
+mlflow.log_artifacts(log_path)
