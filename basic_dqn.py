@@ -17,9 +17,6 @@ from utils import init_ray, check_path, logs_with_timeout, convert_np_arrays
 from mlflow.exceptions import MlflowException
 from func_timeout import FunctionTimedOut
 
-
-from ray.rllib.train import load_experiments_from_file
-
 checkpoint_path = "./checkpoint/"
 init_ray("./ray_config.yml")
 
@@ -115,7 +112,7 @@ for i in tqdm.tqdm(range(1, 10000)):
             logs_with_timeout(learner_data, step=result["episodes_total"])
             _save = {key: sampler[key] for key in keys_to_extract if key in sampler}
             logs_with_timeout(_save, step=result["episodes_total"])
-        if  i % (settings.log.log * 100) == 0:
+        if i % (settings.log.log * 100) == 0:
             algorithm.save_checkpoint(checkpoint_path)
     except FunctionTimedOut:
         tqdm.tqdm.write("logging failed")

@@ -1,8 +1,9 @@
+# Runs on a single g3.4xl node
+# See https://github.com/ray-project/rl-experiments for results
 atari-basic-dqn:
-    env:
-        - SpaceInvadersNoFrameskip-v4
     run: DQN
     config:
+        # Works for both torch and tf.
         framework: torch
         double_q: false
         dueling: false
