@@ -39,5 +39,5 @@ log:
   save_file: "/home/seventheli/logging/"
   save_checkout: "/home/seventheli/checkpoints/"
   score: 400
-  max_time: 7200
+  max_time: 1800
   log: 1
