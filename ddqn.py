@@ -55,7 +55,7 @@ if sub_buffer_size == 0:
         algorithm = DQN(config=hyper_parameters, env=settings.dqn.env)
 else:
     # Set run object
-    run_name = "DQN_PBER_" + datetime.datetime.now().strftime("%Y%m%d")
+    run_name = "DDQN_PBER_" + datetime.datetime.now().strftime("%Y%m%d")
     mlflow_run = mlflow.start_run(run_name=run_name,
                                   tags={"mlflow.user": settings.mlflow.user})
     # Log parameters
