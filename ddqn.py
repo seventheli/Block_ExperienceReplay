@@ -92,7 +92,7 @@ check_path(checkpoint_path)
 checkpoint_path = path.join(checkpoint_path, run_name)
 check_path(checkpoint_path)
 
-with open(checkpoint_path + "%s config.pyl" %run_name, "wb") as f:
+with open(os.path.join(checkpoint_path, "%s config.pyl" % run_name), "wb") as f:
     _ = algorithm.config.to_dict()
     _.pop("multiagent")
     pickle.dump(_, f)
@@ -118,7 +118,7 @@ for i in tqdm.tqdm(range(1, 10000)):
             logs_with_timeout(learner_data, step=result["episodes_total"])
             _save = {key: sampler[key] for key in keys_to_extract if key in sampler}
             logs_with_timeout(_save, step=result["episodes_total"])
-        if  i % (settings.log.log * 100) == 0:
+        if i % (settings.log.log * 100) == 0:
             algorithm.save_checkpoint(checkpoint_path)
     except FunctionTimedOut:
         tqdm.tqdm.write("logging failed")

@@ -83,7 +83,7 @@ check_path(checkpoint_path)
 checkpoint_path = path.join(checkpoint_path, run_name)
 check_path(checkpoint_path)
 
-with open(checkpoint_path + "%s config.pyl" %run_name, "wb") as f:
+with open(os.path.join(checkpoint_path, "%s config.pyl" % run_name), "wb") as f:
     _ = algorithm.config.to_dict()
     _.pop("multiagent")
     pickle.dump(_, f)
