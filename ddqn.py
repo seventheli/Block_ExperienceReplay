@@ -110,7 +110,7 @@ for i in tqdm.tqdm(range(1, 10000)):
         if evaluation is not None:
             _save = {"eval_" + key: evaluation[key] for key in keys_to_extract if key in evaluation}
             logs_with_timeout(_save, step=result["episodes_total"])
-        if i >= 10 or i % settings.log.log == 0:
+        if i >= 10 and i % settings.log.log == 0:
             learner_data = result["info"].copy()
             if learner_data["learner"].get("time_usage", None) is not None:
                 logs_with_timeout(learner_data["learner"].get("time_usage"), step=result["episodes_total"])
