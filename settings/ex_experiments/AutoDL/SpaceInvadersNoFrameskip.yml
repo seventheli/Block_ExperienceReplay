@@ -1,9 +1,9 @@
 mlflow:
-  experiment: "Simple-BreakoutNoFrameskip"
-  url: "http://10.56.238.20:9999"
-  user: "UD1"
+  experiment: "Simple-SpaceInvadersNoFrameskip"
+  url: "https://seventheli-mlflow.eu.cpolar.io/"
+  user: "AutoDL"
 dqn:
-  env: BreakoutNoFrameskip
+  env: SpaceInvadersNoFrameskip
   run: DQN
   hyper_parameters:
     double_q: false
@@ -15,17 +15,8 @@ dqn:
     adam_epsilon: .00015
     hiddens: [ 512 ]
     num_steps_sampled_before_learning_starts: 20000
-    always_attach_evaluation_results: true
-    evaluation_duration_unit: "episodes"
-    evaluation_interval: 10
-    evaluation_num_workers: 1
-    evaluation_duration: 500
-    evaluation_parallel_to_training: true
-    enable_async_evaluation: true
-    exploration_config:
-      final_epsilon: 0.01
     # Extra
-    num_gpus: 1
+    num_gpus: 0.2
     framework: "torch"
     # DQN
     num_envs_per_worker: 1
@@ -38,8 +29,8 @@ dqn:
       type: 'ReplayBuffer'
       capacity: 1000000
 log:
-  save_file: "/home/seventheli/logging/"
-  save_checkout: "/home/seventheli/checkpoints/"
-  score: 20000
+  save_file: "/root/autodl-tmp/logging/"
+  save_checkout: "/home/autodl-tmp/checkpoints/"
+  score: 30000
   max_time: 720000
   log: 5
