@@ -73,12 +73,6 @@ else:
     hyper_parameters["train_batch_size"] = int(hyper_parameters["train_batch_size"] / sub_buffer_size)
     algorithm = ApexDDQNWithDPBER(config=hyper_parameters, env=settings.apex.env)
 
-with open(settings.log.save_checkout + "%s config.pyl" %run_name, "wb") as f:
-    _ = algorithm.config.to_dict()
-    _.pop("multiagent")
-    pickle.dump(_, f)
-mlflow.log_artifacts(settings.log.save_checkout)
-
 # Check path available
 log_path = path.join(settings.log.save_file, settings.apex.env)
 check_path(log_path)
@@ -88,6 +82,13 @@ checkout_path = path.join(settings.log.save_checkout, settings.apex.env)
 check_path(checkout_path)
 checkout_path = path.join(checkout_path, run_name)
 check_path(checkout_path)
+algorithm.logdir = checkout_path
+
+with open(settings.log.save_checkout + "%s config.pyl" %run_name, "wb") as f:
+    _ = algorithm.config.to_dict()
+    _.pop("multiagent")
+    pickle.dump(_, f)
+mlflow.log_artifacts(checkout_path)
 
 # Run algorithms
 keys_to_extract = {"episode_reward_max", "episode_reward_min", "episode_reward_mean"}
@@ -108,7 +109,7 @@ for i in tqdm.tqdm(range(1, 10000)):
             _save = {key: sampler[key] for key in keys_to_extract if key in sampler}
             logs_with_timeout(_save, step=result["episodes_total"])
         if  i % (settings.log.log * 100) == 0:
-            algorithm.save_checkpoint(settings.log.save_checkout)
+            algorithm.save_checkpoint(algorithm.logdir)
     except FunctionTimedOut:
         tqdm.tqdm.write("logging failed")
     except MlflowException:
@@ -121,4 +122,4 @@ for i in tqdm.tqdm(range(1, 10000)):
 with zipfile.ZipFile(os.path.join(settings.log.save_checkout, '%s.zip' % run_name), 'w') as f:
     for file in os.listdir(log_path):
         f.write(os.path.join(log_path, file))
-mlflow.log_artifacts(settings.log.save_checkout)
+mlflow.log_artifacts(checkout_path)
