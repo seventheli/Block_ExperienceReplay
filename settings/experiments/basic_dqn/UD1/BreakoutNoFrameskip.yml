@@ -31,13 +31,13 @@ dqn:
     sample_batch_size: 4
     train_batch_size: 32
     target_network_update_freq: 8000
-    min_sample_timesteps_per_iteration: 10000
+    min_sample_timesteps_per_iteration: 1000
     replay_buffer_config:
       type: 'ReplayBuffer'
-      capacity: 1000000
+      capacity: 100000
 log:
   save_file: "/home/seventheli/logging/"
   save_checkout: "/home/seventheli/checkpoints/"
   score: 400
-  max_time: 720000
-  log: 5
+  max_time: 7200
+  log: 1
