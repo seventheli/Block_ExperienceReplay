@@ -87,16 +87,16 @@ log_path = path.join(settings.log.save_file, settings.dqn.env)
 check_path(log_path)
 log_path = path.join(log_path, run_name)
 check_path(log_path)
-checkout_path = path.join(settings.log.save_checkout, settings.dqn.env)
-check_path(checkout_path)
-checkout_path = path.join(checkout_path, run_name)
-check_path(checkout_path)
+checkpoint_path = path.join(settings.log.save_checkout, settings.dqn.env)
+check_path(checkpoint_path)
+checkpoint_path = path.join(checkpoint_path, run_name)
+check_path(checkpoint_path)
 
-with open(settings.log.save_checkout + "%s config.pyl" %run_name, "wb") as f:
+with open(checkpoint_path + "%s config.pyl" %run_name, "wb") as f:
     _ = algorithm.config.to_dict()
     _.pop("multiagent")
     pickle.dump(_, f)
-mlflow.log_artifacts(checkout_path)
+mlflow.log_artifacts(checkpoint_path)
 
 # Run algorithms
 keys_to_extract = {"episode_reward_max", "episode_reward_min", "episode_reward_mean"}
@@ -119,7 +119,7 @@ for i in tqdm.tqdm(range(1, 10000)):
             _save = {key: sampler[key] for key in keys_to_extract if key in sampler}
             logs_with_timeout(_save, step=result["episodes_total"])
         if  i % (settings.log.log * 100) == 0:
-            algorithm.save_checkpoint(checkout_path)
+            algorithm.save_checkpoint(checkpoint_path)
     except FunctionTimedOut:
         tqdm.tqdm.write("logging failed")
     except MlflowException:
@@ -129,7 +129,7 @@ for i in tqdm.tqdm(range(1, 10000)):
         json.dump(convert_np_arrays(result), f)
     if i >= 10 and (time_used >= settings.log.max_time or result["episode_reward_mean"] > settings.log.score):
         break
-with zipfile.ZipFile(os.path.join(checkout_path, '%s.zip' % run_name), 'w') as f:
+with zipfile.ZipFile(os.path.join(checkpoint_path, '%s.zip' % run_name), 'w') as f:
     for file in os.listdir(log_path):
         f.write(os.path.join(log_path, file))
-mlflow.log_artifacts(checkout_path)
+mlflow.log_artifacts(checkpoint_path)
