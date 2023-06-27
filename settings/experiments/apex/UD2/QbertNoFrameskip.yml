@@ -6,6 +6,7 @@ apex:
   env: QbertNoFrameskip
   run: APEX
   hyper_parameters:
+    framework: torch
     double_q: true
     dueling: false
     num_atoms: 1
@@ -14,28 +15,29 @@ apex:
     lr: .0001
     adam_epsilon: .00015
     hiddens: [ 512 ]
-    # Extra
-    num_gpus: 1
-    framework: "torch"
-    evaluation_duration_unit: "episodes"
-    evaluation_interval: 20
-    evaluation_num_workers: 1
-    evaluation_duration: 100
-    evaluation_parallel_to_training: true
-    # APEX
-    num_workers: 8
-    num_envs_per_worker: 8
-    num_gpus_per_worker: 0
-    sample_batch_size: 20
-    train_batch_size: 512
-    rollout_fragment_length: 20
-    target_network_update_freq: 50000
-    min_sample_timesteps_per_iteration: 25000
     replay_buffer_config:
       type: 'MultiAgentPrioritizedReplayBuffer'
       capacity: 1000000
       prioritized_replay_beta: 1
       prioritized_replay_alpha: 0.5
+    exploration_config:
+      epsilon_timesteps: 200000
+      final_epsilon: 0.01
+    rollout_fragment_length: 20
+    train_batch_size: 512
+    target_network_update_freq: 50000
+    min_sample_timesteps_per_iteration: 25000
+    # Extra
+    num_gpus: 1
+    num_workers: 8
+    num_envs_per_worker: 8
+    num_gpus_per_worker: 0
+    # Eval
+    evaluation_duration_unit: "episodes"
+    evaluation_interval: 20
+    evaluation_num_workers: 1
+    evaluation_duration: 100
+    evaluation_parallel_to_training: true
 log:
   save_file: "/home/seventheli/logging/"
   save_checkout: "/home/seventheli/checkpoints/"
