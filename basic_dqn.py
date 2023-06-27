@@ -85,7 +85,6 @@ checkout_path = path.join(settings.log.save_checkout, settings.dqn.env)
 check_path(checkout_path)
 checkout_path = path.join(checkout_path, run_name)
 check_path(checkout_path)
-algorithm.logdir = checkout_path
 
 with open(settings.log.save_checkout + "%s config.pyl" %run_name, "wb") as f:
     _ = algorithm.config.to_dict()
@@ -113,8 +112,8 @@ for i in tqdm.tqdm(range(1, 10000)):
             logs_with_timeout(learner_data, step=result["episodes_total"])
             _save = {key: sampler[key] for key in keys_to_extract if key in sampler}
             logs_with_timeout(_save, step=result["episodes_total"])
-        if i % (settings.log.log * 100) == 0:
-            algorithm.save_checkpoint(algorithm.logdir)
+        if  i % (settings.log.log * 100) == 0:
+            algorithm.save_checkpoint(checkout_path)
     except FunctionTimedOut:
         tqdm.tqdm.write("logging failed")
     except MlflowException:
@@ -124,7 +123,7 @@ for i in tqdm.tqdm(range(1, 10000)):
         json.dump(convert_np_arrays(result), f)
     if time_used >= settings.log.max_time:
         break
-with zipfile.ZipFile(os.path.join(settings.log.save_checkout, '%s.zip' % run_name), 'w') as f:
+with zipfile.ZipFile(os.path.join(checkout_path, '%s.zip' % run_name), 'w') as f:
     for file in os.listdir(log_path):
         f.write(os.path.join(log_path, file))
 mlflow.log_artifacts(checkout_path)
