@@ -29,7 +29,7 @@ apex:
     min_sample_timesteps_per_iteration: 25000
     # Extra
     num_gpus: 1
-    num_workers: 8
+    num_workers: 4
     num_envs_per_worker: 8
     num_cpus_per_worker: 1
     num_gpus_per_worker: 0.01
