@@ -33,7 +33,6 @@ apex:
     num_envs_per_worker: 8
     num_cpus_per_worker: 1
     num_gpus_per_worker: 0.01
-
     # Eval
     evaluation_duration_unit: "episodes"
     evaluation_interval: 20
