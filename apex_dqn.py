@@ -37,9 +37,14 @@ mlflow_client = mlflow.tracking.MlflowClient()
 
 # Set hyper parameters
 hyper_parameters = settings.apex.hyper_parameters.to_dict()
+if hyper_parameters["double_q"]:
+    run_name = "APEX_DDQN"
+else:
+    run_name = "APEX_DQN"
+
 if sub_buffer_size == 0:
     # Set run object
-    run_name = "APEX_DQN_DPER_" + datetime.datetime.now().strftime("%Y%m%d")
+    run_name = run_name + "_DPER_" + datetime.datetime.now().strftime("%Y%m%d")
     mlflow_run = mlflow.start_run(run_name=run_name,
                                   tags={"mlflow.user": settings.mlflow.user})
     # Log parameters
@@ -47,7 +52,7 @@ if sub_buffer_size == 0:
     mlflow.log_params({key: hyper_parameters[key] for key in hyper_parameters.keys() if key not in ["replay_buffer_config"]})
     algorithm = ApexDQN(config=hyper_parameters, env=settings.apex.env)
 else:
-    run_name = "APEX_DQN_DPBER_" + datetime.datetime.now().strftime("%Y%m%d")
+    run_name = run_name + "_DPBER_" + datetime.datetime.now().strftime("%Y%m%d")
     mlflow_run = mlflow.start_run(run_name=run_name,
                                   tags={"mlflow.user": settings.mlflow.user})
     env_example = wrap_deepmind(gym.make(settings.apex.env))
@@ -107,7 +112,7 @@ for i in tqdm.tqdm(range(1, 10000)):
             logs_with_timeout(learner_data, step=result["episodes_total"])
             _save = {key: sampler[key] for key in keys_to_extract if key in sampler}
             logs_with_timeout(_save, step=result["episodes_total"])
-        if  i % (settings.log.log * 100) == 0:
+        if i % (settings.log.log * 100) == 0:
             algorithm.save_checkpoint(checkpoint_path)
     except FunctionTimedOut:
         tqdm.tqdm.write("logging failed")
@@ -122,4 +127,3 @@ with zipfile.ZipFile(os.path.join(log_path, '%s_log.zip' % run_name), 'w') as f:
     for file in os.listdir(log_path):
         f.write(os.path.join(log_path, file))
 mlflow.log_artifacts(log_path)
-
