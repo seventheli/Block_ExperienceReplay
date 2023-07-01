@@ -6,11 +6,8 @@ dqn:
   env: QbertNoFrameskip
   run: DQN
   hyper_parameters:
-  env: BeamRiderNoFrameskip
-  run: DQN
-  hyper_parameters:
     framework: torch
-    double_q: false
+    double_q: true
     dueling: false
     enable_async_evaluation: true
     evaluation_duration: 100
