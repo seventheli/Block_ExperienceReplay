@@ -129,7 +129,4 @@ for i in tqdm.tqdm(range(1, 10000)):
         json.dump(convert_np_arrays(result), f)
     if i >= 10 and (time_used >= settings.log.max_time or result["episode_reward_mean"] > settings.log.score):
         break
-with zipfile.ZipFile(os.path.join(log_path, '%s_log.zip' % run_name), 'w') as f:
-    for file in os.listdir(log_path):
-        f.write(os.path.join(log_path, file))
 mlflow.log_artifacts(log_path)
