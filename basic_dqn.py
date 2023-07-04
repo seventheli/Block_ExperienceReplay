@@ -95,11 +95,14 @@ mlflow.log_artifacts(checkpoint_path)
 # Run algorithms
 keys_to_extract = {"episode_reward_max", "episode_reward_min", "episode_reward_mean"}
 for i in tqdm.tqdm(range(1, 10000)):
-    result = algorithm.train()
-    time_used = result["time_total_s"]
-    # statistics
-    evaluation = result.get("evaluation", None)
-    sampler = result.get("sampler_results", None)
+    try:
+        result = algorithm.train()
+        time_used = result["time_total_s"]
+        # statistics
+        evaluation = result.get("evaluation", None)
+        sampler = result.get("sampler_results", None)
+    except:
+        continue
     try:
         if evaluation is not None:
             _save = {"eval_" + key: evaluation[key] for key in keys_to_extract if key in evaluation}
