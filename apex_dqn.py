@@ -4,7 +4,6 @@ import tqdm
 import json
 import mlflow
 import pickle
-import zipfile
 import argparse
 import datetime
 from os import path
@@ -17,7 +16,6 @@ from ray.rllib.algorithms.apex_dqn import ApexDQN
 from mlflow.exceptions import MlflowException
 from func_timeout import FunctionTimedOut
 
-checkpoint_path = "./checkpoint/"
 init_ray("./ray_config.yml")
 
 parser = argparse.ArgumentParser()
@@ -44,7 +42,7 @@ else:
 
 if sub_buffer_size == 0:
     # Set run object
-    run_name = run_name + "_DPER_" + datetime.datetime.now().strftime("%Y%m%d")
+    run_name = run_name + "_" + settings.dqn.env + "_DPER_" + datetime.datetime.now().strftime("%Y%m%d")
     mlflow_run = mlflow.start_run(run_name=run_name,
                                   tags={"mlflow.user": settings.mlflow.user})
     # Log parameters
@@ -52,10 +50,12 @@ if sub_buffer_size == 0:
     mlflow.log_params({key: hyper_parameters[key] for key in hyper_parameters.keys() if key not in ["replay_buffer_config"]})
     algorithm = ApexDQN(config=hyper_parameters, env=settings.apex.env)
 else:
-    run_name = run_name + "_DPBER_" + datetime.datetime.now().strftime("%Y%m%d")
+    # Set run object
+    run_name = run_name + "_" + settings.dqn.env + "_DPBER_" + datetime.datetime.now().strftime("%Y%m%d")
     mlflow_run = mlflow.start_run(run_name=run_name,
                                   tags={"mlflow.user": settings.mlflow.user})
     env_example = wrap_deepmind(gym.make(settings.apex.env))
+    # Log parameters
     mlflow.log_params({
         **settings.apex.hyper_parameters.replay_buffer_config.to_dict(),
         "type": "MultiAgentPrioritizedBlockReplayBuffer",
@@ -79,16 +79,14 @@ else:
     algorithm = ApexDDQNWithDPBER(config=hyper_parameters, env=settings.apex.env)
 
 # Check path available
-log_path = path.join(settings.log.save_file, settings.apex.env)
+check_path(settings.log.save_file)
+log_path = path.join(settings.log.save_file, run_name)
 check_path(log_path)
-log_path = path.join(log_path, run_name)
-check_path(log_path)
-checkpoint_path = path.join(settings.log.save_checkout, settings.apex.env)
-check_path(checkpoint_path)
-checkpoint_path = path.join(checkpoint_path, run_name)
+check_path(settings.log.save_checkout)
+checkpoint_path = path.join(settings.log.save_checkout, run_name)
 check_path(checkpoint_path)
 
-with open(os.path.join(checkpoint_path, "%s config.pyl" % run_name), "wb") as f:
+with open(os.path.join(checkpoint_path, "%s_config.pyl" % run_name), "wb") as f:
     _ = algorithm.config.to_dict()
     _.pop("multiagent")
     pickle.dump(_, f)
@@ -101,21 +99,17 @@ for i in tqdm.tqdm(range(1, 10000)):
         result = algorithm.train()
         time_used = result["time_total_s"]
         # statistics
-        evaluation = result.get("evaluation", None)
         sampler = result.get("sampler_results", None)
     except:
         continue
     try:
-        if evaluation is not None:
-            _save = {"eval_" + key: evaluation[key] for key in keys_to_extract if key in evaluation}
-            logs_with_timeout(_save, step=result["episodes_total"])
         if i >= 10 and i % settings.log.log == 0:
             learner_data = result["info"].copy()
             learner_data.pop("learner")
             logs_with_timeout(learner_data, step=result["episodes_total"])
             _save = {key: sampler[key] for key in keys_to_extract if key in sampler}
             logs_with_timeout(_save, step=result["episodes_total"])
-        if i % (settings.log.log * 100) == 0:
+        if i % (settings.log.log * 10) == 0:
             algorithm.save_checkpoint(checkpoint_path)
     except FunctionTimedOut:
         tqdm.tqdm.write("logging failed")
@@ -126,4 +120,6 @@ for i in tqdm.tqdm(range(1, 10000)):
         json.dump(convert_np_arrays(result), f)
     if time_used >= settings.log.max_time:
         break
+
 mlflow.log_artifacts(log_path)
+mlflow.log_artifacts(checkpoint_path)
