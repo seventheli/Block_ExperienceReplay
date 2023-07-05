@@ -9,7 +9,6 @@ dqn:
     framework: torch
     double_q: false
     dueling: false
-    enable_async_evaluation: true
     exploration_config:
       epsilon_timesteps: 200000
       final_epsilon: 0.01

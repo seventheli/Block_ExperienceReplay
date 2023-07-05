@@ -4,7 +4,6 @@ import tqdm
 import json
 import mlflow
 import pickle
-import zipfile
 import argparse
 import datetime
 from os import path
@@ -40,7 +39,7 @@ mlflow_client = mlflow.tracking.MlflowClient()
 hyper_parameters = settings.dqn.hyper_parameters.to_dict()
 if sub_buffer_size == 0:
     # Set run object
-    run_name = "DQN_ER_%s" % settings.dqn.env
+    run_name = "DQN_ER_%s_%s" % (settings.dqn.env, datetime.datetime.now().strftime("%Y%m%d"))
     mlflow_run = mlflow.start_run(run_name=run_name,
                                   tags={"mlflow.user": settings.mlflow.user})
     # Log parameters
@@ -48,7 +47,7 @@ if sub_buffer_size == 0:
     mlflow.log_params({key: hyper_parameters[key] for key in hyper_parameters.keys() if key not in ["replay_buffer_config"]})
 else:
     # Set run object
-    run_name = "DQN_BER_%s" % settings.dqn.env
+    run_name = "DQN_BER_%s_%s" % (settings.dqn.env, datetime.datetime.now().strftime("%Y%m%d"))
     mlflow_run = mlflow.start_run(run_name=run_name,
                                   tags={"mlflow.user": settings.mlflow.user})
     # Log parameters
