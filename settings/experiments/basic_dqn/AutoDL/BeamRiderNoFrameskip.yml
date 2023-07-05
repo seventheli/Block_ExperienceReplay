@@ -10,11 +10,6 @@ dqn:
     double_q: false
     dueling: false
     enable_async_evaluation: true
-    evaluation_duration: 100
-    evaluation_duration_unit: "episodes"
-    evaluation_interval: 10
-    evaluation_num_workers: 1
-    evaluation_parallel_to_training: true
     exploration_config:
       epsilon_timesteps: 200000
       final_epsilon: 0.01
@@ -34,8 +29,8 @@ dqn:
     num_gpus: 1
     min_sample_timesteps_per_iteration: 10000
 log:
-  save_file: "/root/autodl-tmp/logging/"
-  save_checkout: "/home/autodl-tmp/checkpoints/"
+  save_file: "/root/autodl-tmp/logging/BeamRider"
+  save_checkout: "/home/autodl-tmp/checkpoints/BeamRider"
   score: 30000
-  max_time: 720000
+  max_time: 518400
   log: 5
