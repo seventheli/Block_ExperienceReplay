@@ -31,5 +31,5 @@ log:
   save_file: "/home/seventheli/logging/Q_Bert"
   save_checkout: "/home/seventheli/checkpoints/Q_Bert"
   score: 20000
-  max_time: 720000
+  max_time: 518400
   log: 5

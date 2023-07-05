@@ -9,12 +9,6 @@ dqn:
     framework: torch
     double_q: true
     dueling: false
-    enable_async_evaluation: true
-    evaluation_duration: 100
-    evaluation_duration_unit: "episodes"
-    evaluation_interval: 10
-    evaluation_num_workers: 1
-    evaluation_parallel_to_training: true
     exploration_config:
       epsilon_timesteps: 200000
       final_epsilon: 0.01
@@ -36,8 +30,8 @@ dqn:
     num_gpus: 1
     min_sample_timesteps_per_iteration: 10000
 log:
-  save_file: "/home/seventheli/logging/"
-  save_checkout: "/home/seventheli/checkpoints/"
-  score: 400
-  max_time: 720000
+  save_file: "/home/seventheli/logging/Breakout"
+  save_checkout: "/home/seventheli/checkpoints/Breakout"
+  score: 20000
+  max_time: 518400
   log: 5

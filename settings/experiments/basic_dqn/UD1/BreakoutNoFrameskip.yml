@@ -31,5 +31,5 @@ log:
   save_file: "/home/seventheli/logging/Breakout"
   save_checkout: "/home/seventheli/checkpoints/Breakout"
   score: 20000
-  max_time: 720000
+  max_time: 518400
   log: 5
