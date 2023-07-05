@@ -35,7 +35,7 @@ dqn:
     min_sample_timesteps_per_iteration: 10000
 log:
   save_file: "/root/autodl-tmp/logging/"
-  save_checkout: "/home/autodl-tmp/checkpoints/"
+  save_checkpoint: "/home/autodl-tmp/checkpoints/"
   score: 30000
   max_time: 720000
   log: 5

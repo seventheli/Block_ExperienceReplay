@@ -40,7 +40,7 @@ apex:
     evaluation_parallel_to_training: true
 log:
   save_file: "/home/seventheli/logging/"
-  save_checkout: "/home/seventheli/checkpoints/"
+  save_checkpoint: "/home/seventheli/checkpoints/"
   score: 20000
   max_time: 720000
   log: 5

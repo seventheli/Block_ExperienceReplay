@@ -41,7 +41,7 @@ apex:
     evaluation_parallel_to_training: true
 log:
   save_file: "/root/autodl-tmp/logging/"
-  save_checkout: "/root/autodl-tmp/checkpoints/"
+  save_checkpoint: "/root/autodl-tmp/checkpoints/"
   score: 30000
   max_time: 720000
   log: 5

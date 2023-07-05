@@ -1,10 +1,10 @@
 import os
 import gym
+import torch.cuda
 import tqdm
 import json
 import mlflow
 import pickle
-import zipfile
 import argparse
 import datetime
 from os import path
@@ -83,7 +83,7 @@ log_path = path.join(settings.log.save_file, settings.apex.env)
 check_path(log_path)
 log_path = path.join(log_path, run_name)
 check_path(log_path)
-checkpoint_path = path.join(settings.log.save_checkout, settings.apex.env)
+checkpoint_path = path.join(settings.log.save_checkpoint, settings.apex.env)
 check_path(checkpoint_path)
 checkpoint_path = path.join(checkpoint_path, run_name)
 check_path(checkpoint_path)
