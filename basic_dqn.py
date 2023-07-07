@@ -1,9 +1,11 @@
 import os
 import gym
+import torch.cuda
 import tqdm
 import json
 import pickle
 import argparse
+import datetime
 from os import path
 from dynaconf import Dynaconf
 from ray.rllib.algorithms.dqn import DQN
@@ -30,10 +32,10 @@ settings = Dynaconf(envvar_prefix="DYNACONF", settings_files=settings)
 hyper_parameters = settings.dqn.hyper_parameters.to_dict()
 if sub_buffer_size == 0:
     # Set run object
-    run_name = "DQN_ER"
+    run_name = "DQN_ER_%s_%s" % (settings.dqn.env, datetime.datetime.now().strftime("%Y%m%d"))
 else:
     # Set run object
-    run_name = "DQN_BER"
+    run_name = "DQN_BER_%s_%s" % (settings.dqn.env, datetime.datetime.now().strftime("%Y%m%d"))
     # Log parameters
     env_example = wrap_deepmind(gym.make(settings.dqn.env))
     # Set BER
@@ -53,13 +55,11 @@ else:
     algorithm = DQN(config=hyper_parameters, env=settings.dqn.env)
 
 # Check path available
-log_path = path.join(settings.log.save_file, settings.dqn.env)
+check_path(settings.log.save_file)
+log_path = path.join(settings.log.save_file, run_name)
 check_path(log_path)
-log_path = path.join(log_path, run_name)
-check_path(log_path)
-checkpoint_path = path.join(settings.log.save_checkpoint, settings.dqn.env)
-check_path(checkpoint_path)
-checkpoint_path = path.join(checkpoint_path, run_name)
+check_path(settings.log.save_checkout)
+checkpoint_path = path.join(settings.log.save_checkout, run_name)
 check_path(checkpoint_path)
 
 with open(os.path.join(checkpoint_path, "%s_config.pyl" % run_name), "wb") as f:
@@ -70,15 +70,16 @@ with open(os.path.join(checkpoint_path, "%s_config.pyl" % run_name), "wb") as f:
 # Run algorithms
 keys_to_extract = {"episode_reward_max", "episode_reward_min", "episode_reward_mean"}
 for i in tqdm.tqdm(range(1, 10000)):
-    result = algorithm.train()
-    time_used = result["time_total_s"]
-    # statistics
-    evaluation = result.get("evaluation", None)
-    sampler = result.get("sampler_results", None)
-    if i % settings.log.log == 0:
-        algorithm.save_checkpoint(checkpoint_path)
-    with open(path.join(log_path, str(i) + ".json"), "w") as f:
-        result["config"] = None
-        json.dump(convert_np_arrays(result), f)
-    if time_used >= settings.log.max_time:
-        break
+    try:
+        result = algorithm.train()
+        time_used = result["time_total_s"]
+        if i % settings.log.log == 0:
+            algorithm.save_checkpoint(checkpoint_path)
+        with open(path.join(log_path, str(i) + ".json"), "w") as f:
+            result["config"] = None
+            json.dump(convert_np_arrays(result), f)
+        if time_used >= settings.log.max_time:
+            break
+    except:
+        pass
+

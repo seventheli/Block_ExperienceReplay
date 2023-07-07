@@ -1,20 +1,10 @@
-mlflow:
-  experiment: "Simple-BreakoutNoFrameskip"
-  url: "http://10.56.238.20:9999"
-  user: "UD1"
 dqn:
-  env: BreakoutNoFrameskip
+  env: PongNoFrameskip
   run: DQN
   hyper_parameters:
     framework: torch
     double_q: false
     dueling: false
-    enable_async_evaluation: true
-    evaluation_duration: 100
-    evaluation_duration_unit: "episodes"
-    evaluation_interval: 10
-    evaluation_num_workers: 1
-    evaluation_parallel_to_training: true
     exploration_config:
       epsilon_timesteps: 200000
       final_epsilon: 0.01
@@ -34,8 +24,8 @@ dqn:
     num_gpus: 1
     min_sample_timesteps_per_iteration: 10000
 log:
-  save_file: "/home/seventheli/logging/"
-  save_checkpoint: "/home/seventheli/checkpoints/"
+  save_file: "/tmp/logging/Pong"
+  save_checkout: "/tmp/checkpoints/Pong"
   score: 20000
-  max_time: 720000
+  max_time: 360
   log: 5
