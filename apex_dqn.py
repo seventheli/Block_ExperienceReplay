@@ -42,7 +42,7 @@ else:
 
 if sub_buffer_size == 0:
     # Set run object
-    run_name = run_name + "_" + settings.dqn.env + "_DPER_" + datetime.datetime.now().strftime("%Y%m%d")
+    run_name = run_name + "_" + settings.apex.env + "_DPER_" + datetime.datetime.now().strftime("%Y%m%d")
     mlflow_run = mlflow.start_run(run_name=run_name,
                                   tags={"mlflow.user": settings.mlflow.user})
     # Log parameters
@@ -51,7 +51,7 @@ if sub_buffer_size == 0:
     algorithm = ApexDQN(config=hyper_parameters, env=settings.apex.env)
 else:
     # Set run object
-    run_name = run_name + "_" + settings.dqn.env + "_DPBER_" + datetime.datetime.now().strftime("%Y%m%d")
+    run_name = run_name + "_" + settings.apex.env + "_DPBER_" + datetime.datetime.now().strftime("%Y%m%d")
     mlflow_run = mlflow.start_run(run_name=run_name,
                                   tags={"mlflow.user": settings.mlflow.user})
     env_example = wrap_deepmind(gym.make(settings.apex.env))
