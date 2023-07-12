@@ -36,5 +36,5 @@ log:
   save_file: "/root/autodl-tmp/logging/"
   save_checkout: "/root/autodl-tmp/checkpoints/"
   score: 30000
-  max_time: 720000
+  max_time: 518400
   log: 5
