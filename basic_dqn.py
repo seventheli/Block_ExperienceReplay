@@ -1,6 +1,5 @@
 import os
 import gym
-import torch.cuda
 import tqdm
 import json
 import pickle
@@ -82,4 +81,3 @@ for i in tqdm.tqdm(range(1, 10000)):
             break
     except:
         pass
-

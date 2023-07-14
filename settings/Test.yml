@@ -12,7 +12,7 @@ dqn:
     noisy: false
     replay_buffer_config:
       type: ReplayBuffer
-      capacity: 1000000
+      capacity: 10000
     num_steps_sampled_before_learning_starts: 20000
     n_step: 1
     target_network_update_freq: 8000
@@ -24,8 +24,8 @@ dqn:
     num_gpus: 1
     min_sample_timesteps_per_iteration: 10000
 log:
-  save_file: "/tmp/logging/Pong"
-  save_checkout: "/tmp/checkpoints/Pong"
+  save_file: "/tmp/logging/Test"
+  save_checkout: "/tmp/checkpoints/Test"
   score: 20000
-  max_time: 360
+  max_time: 1200
   log: 5

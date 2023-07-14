@@ -2,7 +2,6 @@ import os
 import gym
 import tqdm
 import json
-import mlflow
 import pickle
 import argparse
 import datetime
@@ -14,9 +13,7 @@ from algorithms_with_statistics.ddqn_per import DDQNWithMPERAndLogging
 from algorithms.ddqn_pber import DDQNWithMPBER
 from replay_buffer.mpber import MultiAgentPrioritizedBlockReplayBuffer
 from ray.rllib.env.wrappers.atari_wrappers import wrap_deepmind
-from utils import init_ray, check_path, logs_with_timeout, convert_np_arrays
-from mlflow.exceptions import MlflowException
-from func_timeout import FunctionTimedOut
+from utils import init_ray, check_path, convert_np_arrays
 
 init_ray("./ray_config.yml")
 

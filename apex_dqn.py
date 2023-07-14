@@ -2,7 +2,6 @@ import os
 import gym
 import tqdm
 import json
-import mlflow
 import pickle
 import argparse
 import datetime
@@ -11,10 +10,8 @@ from dynaconf import Dynaconf
 from algorithms.apex_ddqn_pber import ApexDDQNWithDPBER
 from replay_buffer.mpber import MultiAgentPrioritizedBlockReplayBuffer
 from ray.rllib.env.wrappers.atari_wrappers import wrap_deepmind
-from utils import init_ray, check_path, logs_with_timeout, convert_np_arrays
+from utils import init_ray, check_path, convert_np_arrays
 from ray.rllib.algorithms.apex_dqn import ApexDQN
-from mlflow.exceptions import MlflowException
-from func_timeout import FunctionTimedOut
 
 init_ray("./ray_config.yml")
 
@@ -71,7 +68,6 @@ with open(os.path.join(checkpoint_path, "%s_config.pyl" % run_name), "wb") as f:
     _ = algorithm.config.to_dict()
     _.pop("multiagent")
     pickle.dump(_, f)
-mlflow.log_artifacts(checkpoint_path)
 
 # Run algorithms
 keys_to_extract = {"episode_reward_max", "episode_reward_min", "episode_reward_mean"}
@@ -88,4 +84,3 @@ for i in tqdm.tqdm(range(1, 10000)):
             break
     except:
         pass
-

@@ -20,7 +20,7 @@ dqn:
     target_network_update_freq: 8000
     lr: .0000625
     adam_epsilon: .00015
-    hiddens: [512]
+    hiddens: [ 512 ]
     rollout_fragment_length: 4
     train_batch_size: 32
     num_gpus: 1
