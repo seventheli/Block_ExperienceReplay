@@ -19,4 +19,4 @@ From: python:3.8-slim-buster
 
 %runscript
     cd /local_scratch
-
+    python3 py_example.py
