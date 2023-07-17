@@ -18,3 +18,4 @@ From: python:3.8-slim-buster
 
 %runscript
     cd /local_scratch
+    echo whereis python3
