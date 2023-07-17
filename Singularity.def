@@ -14,7 +14,7 @@ From: python:3.8-slim-buster
     export PATH=/usr/local/bin:$PATH
 
 %files
-    /home/seventheli/research/Block_ExperienceReplay /local_scratch
+    /home/seventheli/Research/Block_ExperienceReplay /local_scratch
 
 %runscript
     cd /local_scratch
