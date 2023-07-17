@@ -10,6 +10,8 @@ From: python:3.8-slim-buster
     grpcio==1.48.2 ale-py==0.7.5 ray==2.2.0 ray[default]==2.2.0 ray[rllib]==2.2.0 \
     ray[tune]==2.2.0 ray[air]==2.2.0 gym==0.23.1 mlflow pyyaml func_timeout \
     tqdm dynaconf gym[accept-rom-license] gputil
+    mkdir -p /tmp
+    mkdir -p /local_scratch
 %environment
     export PATH=/usr/local/bin:$PATH
 
