@@ -29,8 +29,7 @@ apex:
     target_network_update_freq: 50000
     train_batch_size: 512
 log:
-  save_file: "/tmp/logging/Pong"
-  save_checkout: "/tmp/checkpoints/Pong"
-  score: 20000
-  max_time: 360
-  log: 5
+  save_file: "/jmain02/home/J2AD006/jxb06/cxz46-jxb06/logging"
+  save_checkout: "/jmain02/home/J2AD006/jxb06/cxz46-jxb06/checkpoints"
+  max_time: 360000
+  log: 100

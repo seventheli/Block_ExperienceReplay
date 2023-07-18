@@ -6,8 +6,7 @@ from gym import spaces
 from typing import Dict, Tuple, Union
 
 
-def init_ray(checkpoint_path="./checkpoint/", ray_setting=None):
-    check_path(checkpoint_path)
+def init_ray(ray_setting=None):
     if ray_setting is not None:
         with open(ray_setting, 'r') as file:
             settings = yaml.safe_load(file)
