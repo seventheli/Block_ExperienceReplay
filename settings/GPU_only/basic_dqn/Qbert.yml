@@ -1,7 +1,7 @@
 mlflow:
   experiment: "Q*Bert"
-  url: "https://seventheli-mlflow.eu.cpolar.io/"
-  user: "AutoDL"
+  url: "http://127.0.0.1:9999"
+  user: "UD2"
 dqn:
   env: Qbert
   run: DQN
