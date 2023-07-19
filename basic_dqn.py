@@ -74,6 +74,8 @@ if with_er_logging:
 else:
     algorithm = DQN(config=hyper_parameters, env=settings.dqn.env)
 
+
+
 # Check path available
 check_path(settings.log.save_file)
 log_path = path.join(settings.log.save_file, run_name)
