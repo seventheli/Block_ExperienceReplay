@@ -1,9 +1,9 @@
 mlflow:
-  experiment: "Simple-BeamRiderNoFrameskip"
+  experiment: "BeamRider"
   url: "https://seventheli-mlflow.eu.cpolar.io/"
   user: "AutoDL"
 dqn:
-  env: BeamRiderNoFrameskip
+  env: BeamRider
   run: DQN
   hyper_parameters:
     framework: torch
@@ -26,6 +26,8 @@ dqn:
     rollout_fragment_length: 4
     train_batch_size: 32
     num_gpus: 1
+    num_workers: 1
+    num_gpus_per_worker: 0.01
     min_sample_timesteps_per_iteration: 10000
 log:
   save_file: "/root/autodl-tmp/logging/BeamRider"
