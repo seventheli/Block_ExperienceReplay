@@ -74,7 +74,7 @@ if with_er_logging:
 else:
     algorithm = DQN(config=hyper_parameters, env=settings.dqn.env)
 
-
+print(algorithm.config.to_dict()["replay_buffer_config"])
 
 # Check path available
 check_path(settings.log.save_file)
