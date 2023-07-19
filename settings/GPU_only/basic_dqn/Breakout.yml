@@ -3,7 +3,7 @@ mlflow:
   url: "http://10.56.238.20:9999"
   user: "UD1"
 dqn:
-  env: Breakout
+  env: BreakoutNoFrameskip
   run: DQN
   hyper_parameters:
     framework: torch

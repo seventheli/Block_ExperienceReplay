@@ -3,7 +3,7 @@ mlflow:
   url: "https://seventheli-mlflow.eu.cpolar.io/"
   user: "AutoDL"
 dqn:
-  env: BeamRider
+  env: BeamRiderNoFrameskip
   run: DQN
   hyper_parameters:
     framework: torch

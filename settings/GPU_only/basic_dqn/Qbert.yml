@@ -3,7 +3,7 @@ mlflow:
   url: "http://127.0.0.1:9999"
   user: "UD2"
 dqn:
-  env: Qbert
+  env: QbertNoFrameskip
   run: DQN
   hyper_parameters:
     framework: torch
