@@ -10,9 +10,6 @@ dependencies:
   - pip:
       - --extra-index-url https://download.pytorch.org/whl/cu113
       - setuptools==67.0
-      - torch==1.12.1+cu113
-      - torchvision==0.13.1+cu113
-      - torchaudio==0.12.1
       - ray==2.2.0
       - ray[default]==2.2.0
       - ray[rllib]==2.2.0
@@ -30,3 +27,6 @@ dependencies:
       - dynaconf
       - gym[accept-rom-license]
       - gputil
+      - torch==1.12.1+cu113
+      - torchvision==0.13.1+cu113
+      - torchaudio==0.12.1
