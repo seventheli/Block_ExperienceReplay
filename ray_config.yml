@@ -1,0 +1,8 @@
+_system_config:
+  maximum_gcs_destroyed_actor_cached_count: 1000
+dashboard_host:
+  0.0.0.0
+num_gpus:
+  1
+num_cpus:
+  10
