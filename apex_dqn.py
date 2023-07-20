@@ -1,4 +1,5 @@
 import os
+import ray
 import gym
 import tqdm
 import json
@@ -16,8 +17,8 @@ from ray.rllib.algorithms.apex_dqn import ApexDQN
 from mlflow.exceptions import MlflowException
 from func_timeout import FunctionTimedOut
 
-init_ray("./ray_config.yml")
-
+# init_ray("./ray_config.yml")
+ray.init(address="auto")
 parser = argparse.ArgumentParser()
 parser.add_argument("-S", "--setting", dest="setting_path", type=str)
 parser.add_argument("-SBZ", "--sub_buffer_size", dest="sub_buffer_size", type=int, default=0)

@@ -1,4 +1,5 @@
 import os
+import ray
 import gym
 import tqdm
 import json
@@ -18,8 +19,8 @@ from utils import init_ray, check_path, logs_with_timeout, convert_np_arrays
 from mlflow.exceptions import MlflowException
 from func_timeout import FunctionTimedOut
 
-init_ray("./ray_config.yml")
-
+# init_ray("./ray_config.yml")
+ray.init(address="auto")
 parser = argparse.ArgumentParser()
 parser.add_argument("-S", "--setting", dest="setting_path", type=str)
 parser.add_argument("-L", "--with_er_logging", dest="er_logging", type=int, default=0)
