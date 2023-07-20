@@ -59,6 +59,8 @@ else:
     else:
         algorithm = DDQNWithMPBER(config=hyper_parameters, env=settings.dqn.env)
 
+print(algorithm.config.to_dict()["replay_buffer_config"])
+
 # Check path available
 check_path(settings.log.save_file)
 log_path = path.join(settings.log.save_file, run_name)

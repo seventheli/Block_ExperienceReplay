@@ -34,11 +34,11 @@ else:
 
 if sub_buffer_size == 0:
     # Set run object
-    run_name = run_name + "_" + settings.dqn.env + "_DPER_" + datetime.datetime.now().strftime("%Y%m%d")
+    run_name = run_name + "_" + settings.apex.env + "_DPER_" + datetime.datetime.now().strftime("%Y%m%d")
     algorithm = ApexDQN(config=hyper_parameters, env=settings.apex.env)
 else:
     # Set run object
-    run_name = run_name + "_" + settings.dqn.env + "_DPBER_" + datetime.datetime.now().strftime("%Y%m%d")
+    run_name = run_name + "_" + settings.apex.env + "_DPBER_" + datetime.datetime.now().strftime("%Y%m%d")
     env_example = wrap_deepmind(gym.make(settings.apex.env))
     # Set BER
     replay_buffer_config = {
@@ -55,6 +55,8 @@ else:
     hyper_parameters["replay_buffer_config"] = replay_buffer_config
     hyper_parameters["train_batch_size"] = int(hyper_parameters["train_batch_size"] / sub_buffer_size)
     algorithm = ApexDDQNWithDPBER(config=hyper_parameters, env=settings.apex.env)
+
+print(algorithm.config.to_dict()["replay_buffer_config"])
 
 # Check path available
 check_path(settings.log.save_file)
