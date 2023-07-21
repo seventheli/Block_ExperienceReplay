@@ -4,7 +4,6 @@ From: continuumio/miniconda3
 %post
     apt-get -y update
     apt-get -y upgrade
-    cp ./environment.tml /tmp
     # Create a conda environment using the provided file
     conda env create -f /tmp/environment.yml
 
