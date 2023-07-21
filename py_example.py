@@ -14,7 +14,7 @@ from utils import init_ray, convert_np_arrays, check_path
 check_path("/tmp/")
 init_ray("./ray_config.yml")
 
-settings = "./settings/Test.yml"
+settings = "./settings/Test_er.yml"
 settings = Dynaconf(envvar_prefix="DYNACONF", settings_files=settings)
 
 hyper_parameters = settings.dqn.hyper_parameters.to_dict()

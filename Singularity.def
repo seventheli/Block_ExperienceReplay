@@ -11,6 +11,7 @@ From: python:3.9-slim-buster
     ale-py==0.7.5 ray==2.2.0 ray[default]==2.2.0 ray[rllib]==2.2.0 \
     ray[tune]==2.2.0 gym==0.23.0 grpcio==1.48.1 mlflow pyyaml func_timeout \
     tqdm dynaconf gym[accept-rom-license] gputil
+    pip install -U pydantic
     mkdir -p /tmp
     mkdir -p /local_scratch
 %environment

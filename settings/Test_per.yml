@@ -1,8 +1,9 @@
 dqn:
   env: QbertNoFrameskip
+  run: DQN
   hyper_parameters:
     framework: torch
-    double_q: false
+    double_q: true
     dueling: false
     exploration_config:
       epsilon_timesteps: 200000
@@ -10,8 +11,10 @@ dqn:
     num_atoms: 1
     noisy: false
     replay_buffer_config:
-      type: ReplayBuffer
+      type: MultiAgentPrioritizedReplayBuffer
       capacity: 1000000
+      prioritized_replay_beta: 1
+      prioritized_replay_alpha: 0.5
     num_steps_sampled_before_learning_starts: 20000
     n_step: 1
     target_network_update_freq: 8000
@@ -22,8 +25,9 @@ dqn:
     train_batch_size: 32
     num_gpus: 1
     num_cpus: 5
+    num_workers: 1
+    num_gpus_per_worker: 0.1
     min_sample_timesteps_per_iteration: 10000
-  run: DQN
 log:
   log: 100
   max_time: 360000
