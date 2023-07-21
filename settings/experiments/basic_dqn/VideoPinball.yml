@@ -1,5 +1,5 @@
 dqn:
-  env: PongNoFrameskip-v4
+  env: VideoPinballNoFrameskip-v4
   hyper_parameters:
     adam_epsilon: 0.00015
     double_q: false
@@ -27,5 +27,5 @@ dqn:
 log:
   log: 100
   max_time: 360000
-  save_checkout: /jmain02/home/J2AD006/jxb06/cxz46-jxb06/checkpoints/Pong
-  save_file: /jmain02/home/J2AD006/jxb06/cxz46-jxb06/logging/Pong
+  save_checkout: /jmain02/home/J2AD006/jxb06/cxz46-jxb06/checkpoints/VideoPinball
+  save_file: /jmain02/home/J2AD006/jxb06/cxz46-jxb06/logging/VideoPinball
