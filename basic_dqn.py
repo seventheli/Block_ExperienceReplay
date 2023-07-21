@@ -68,11 +68,20 @@ with open(os.path.join(checkpoint_path, "%s_config.pyl" % run_name), "wb") as f:
     _.pop("multiagent")
     pickle.dump(_, f)
 
+algorithm._
 # Run algorithms
 keys_to_extract = {"episode_reward_max", "episode_reward_min", "episode_reward_mean"}
 for i in tqdm.tqdm(range(1, 10000)):
     try:
         result = algorithm.train()
+        import tree
+        import sys
+        import numpy as np
+        x = tree.flatten(algorithm.local_replay_buffer._storage[10])
+        [v.nbytes if isinstance(v, np.ndarray) else sys.getsizeof(v) for v in x]
+        import pdb
+
+        pdb.set_trace()
         time_used = result["time_total_s"]
         if i % settings.log.log == 0:
             algorithm.save_checkpoint(checkpoint_path)
