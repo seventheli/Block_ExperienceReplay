@@ -10,6 +10,7 @@ from dynaconf import Dynaconf
 from ray.rllib.algorithms.dqn import DQN
 from algorithms_with_statistics.basic_dqn import DQNWithLogging
 from replay_buffer.ber import BlockReplayBuffer
+from ray.rllib.env.wrappers.atari_wrappers import wrap_deepmind
 from utils import init_ray, convert_np_arrays, check_path
 
 init_ray("./ray_config.yml")
@@ -35,7 +36,7 @@ else:
     # Set run object
     run_name = "DQN_BER_%s_%s" % (settings.dqn.env, datetime.datetime.now().strftime("%Y%m%d"))
     # Log parameters
-    env_example = gym.make(settings.dqn.env)
+    env_example = wrap_deepmind(gym.make(settings.dqn.env))
     # Set BER
     replay_buffer_config = {
         **settings.dqn.hyper_parameters.replay_buffer_config.to_dict(),
