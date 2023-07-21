@@ -30,6 +30,6 @@ apex:
     train_batch_size: 512
 log:
   save_file: "./Test_Log"
-  save_checkout: "/Test_Log"
+  save_checkout: "./Test_Log"
   max_time: 360000
   log: 100

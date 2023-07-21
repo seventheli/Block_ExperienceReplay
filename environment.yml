@@ -11,7 +11,7 @@ dependencies:
       - torch==1.12.1+cu113
       - torchvision==0.13.1+cu113
       - torchaudio==0.12.1
-      - grpcio=1.48.1
+      - grpcio==1.48.1
       - ale-py==0.7.5
       - ray==2.2.0
       - ray[default]==2.2.0
@@ -19,6 +19,7 @@ dependencies:
       - ray[tune]==2.2.0
       - gym==0.23.0
       - numpy==1.23.5
+      - pydantic<2
       - mlflow
       - pyyaml
       - func_timeout

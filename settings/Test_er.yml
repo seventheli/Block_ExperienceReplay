@@ -25,6 +25,6 @@ dqn:
     min_sample_timesteps_per_iteration: 10000
 log:
   save_file: "./Test_Log"
-  save_checkout: "/Test_Log"
+  save_checkout: "./Test_Log"
   max_time: 360000
   log: 100
