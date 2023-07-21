@@ -12,7 +12,7 @@ From: python:3.9-slim-buster
     gym==0.23.0 grpcio==1.48.1 mlflow pyyaml func_timeout \
     tqdm dynaconf  gputil
     pip install -U pydantic
-    pip install ray[default]==2.0.0 ray[rllib]==2.0.0 ray[tune]==2.0.0
+    pip install ray[default]==2.1.0 ray[rllib]==2.1.0 ray[tune]==2.1.0
     mkdir -p /tmp
     mkdir -p /local_scratch
 %environment
