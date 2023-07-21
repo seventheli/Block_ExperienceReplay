@@ -29,7 +29,7 @@ dqn:
     num_gpus_per_worker: 0.1
     min_sample_timesteps_per_iteration: 10000
 log:
-  log: 100
+  save_file: "./Test_Log"
+  save_checkout: "/Test_Log"
   max_time: 360000
-  save_checkout: /jmain02/home/J2AD006/jxb06/cxz46-jxb06/checkpoints/Qbert
-  save_file: /jmain02/home/J2AD006/jxb06/cxz46-jxb06/logging/Qbert
+  log: 100
