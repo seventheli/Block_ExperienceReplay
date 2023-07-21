@@ -26,8 +26,9 @@ dqn:
     rollout_fragment_length: 4
     train_batch_size: 32
     num_gpus: 1
+    num_cpus: 5
     num_workers: 1
-    num_gpus_per_worker: 0.01
+    num_gpus_per_worker: 0.1
     min_sample_timesteps_per_iteration: 10000
 log:
   save_file: "/root/autodl-tmp/logging/SpaceInvaders"
