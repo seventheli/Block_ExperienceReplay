@@ -1,6 +1,5 @@
 dqn:
-  env: PongNoFrameskip
-  run: DQN
+  env: QbertNoFrameskip
   hyper_parameters:
     framework: torch
     double_q: false
@@ -12,20 +11,21 @@ dqn:
     noisy: false
     replay_buffer_config:
       type: ReplayBuffer
-      capacity: 10000
+      capacity: 1000000
     num_steps_sampled_before_learning_starts: 20000
     n_step: 1
     target_network_update_freq: 8000
     lr: .0000625
     adam_epsilon: .00015
-    hiddens: [ 512 ]
+    hiddens: [512]
     rollout_fragment_length: 4
     train_batch_size: 32
     num_gpus: 1
+    num_cpus: 5
     min_sample_timesteps_per_iteration: 10000
+  run: DQN
 log:
-  save_file: "/jmain02/home/J2AD006/jxb06/cxz46-jxb06/logging"
-  save_checkout: "/jmain02/home/J2AD006/jxb06/cxz46-jxb06/checkpoints"
-  score: 20000
-  max_time: 1200
-  log: 5
+  log: 100
+  max_time: 360000
+  save_checkout: /jmain02/home/J2AD006/jxb06/cxz46-jxb06/checkpoints/Qbert
+  save_file: /jmain02/home/J2AD006/jxb06/cxz46-jxb06/logging/Qbert

@@ -15,6 +15,7 @@ dqn:
     n_step: 1
     noisy: false
     num_atoms: 1
+    num_cpus: 5
     num_gpus: 1
     num_steps_sampled_before_learning_starts: 20000
     replay_buffer_config:
