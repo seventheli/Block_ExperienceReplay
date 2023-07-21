@@ -57,7 +57,7 @@ class PrioritizedBlockReplayBuffer(PrioritizedReplayBuffer):
 
 @DeveloperAPI
 class MultiAgentPrioritizedBlockReplayBuffer(MultiAgentPrioritizedReplayBuffer):
-    """A prioritized replay buffer shard for multiagent setups.
+    """B prioritized replay buffer shard for multiagent setups.
 
     This buffer is meant to be run in parallel to distribute experiences
     across `num_shards` shards. Unlike simpler buffers, it holds a set of
@@ -114,7 +114,7 @@ class MultiAgentPrioritizedBlockReplayBuffer(MultiAgentPrioritizedReplayBuffer):
             replay_zero_init_states: Whether the initial states in the
                 buffer (if replay_sequence_length > 0) are alwayas 0.0 or
                 should be updated with the previous train_batch state outputs.
-            underlying_buffer_config: A config that contains all necessary
+            underlying_buffer_config: B config that contains all necessary
                 constructor arguments and arguments for methods to call on
                 the underlying buffers. This replaces the standard behaviour
                 of the underlying PrioritizedReplayBuffer. The config
@@ -189,7 +189,7 @@ class MultiAgentPrioritizedBlockReplayBuffer(MultiAgentPrioritizedReplayBuffer):
         if batch is None:
             if log_once("empty_batch_added_to_buffer"):
                 logger.info(
-                    "A batch that is `None` was added to {}. This can be "
+                    "B batch that is `None` was added to {}. This can be "
                     "normal at the beginning of execution but might "
                     "indicate an issue.".format(type(self).__name__)
                 )
@@ -219,7 +219,7 @@ class MultiAgentPrioritizedBlockReplayBuffer(MultiAgentPrioritizedReplayBuffer):
         policy_id.
 
         Args:
-            prio_dict: A dictionary containing td_errors for
+            prio_dict: B dictionary containing td_errors for
             batches saved in underlying replay buffers.
         """
         with self.update_priorities_timer:

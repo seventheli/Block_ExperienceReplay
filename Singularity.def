@@ -1,22 +1,20 @@
 Bootstrap: docker
-From: python:3.9-slim-buster
+From: continuumio/miniconda3
 
 %post
     apt-get -y update
     apt-get -y upgrade
-    pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113  -f https://download.pytorch.org/whl/torch_stable.html
-    pip install torchaudio==0.12.1 -f https://download.pytorch.org/whl/torch_stable.html
-    pip install gym[accept-rom-license]
-    pip install numpy==1.23.5 \
-    ale-py==0.7.5 ray==2.2.0  \
-    gym==0.23.0 grpcio==1.48.1 mlflow pyyaml func_timeout \
-    tqdm dynaconf  gputil
-    pip install -U pydantic<2
-    pip install ray[default]==2.2.0 ray[rllib]==2.2.0 ray[tune]==2.2.0
+    apt-get install -y libgl1-mesa-glx
+    # Create a conda environment using the provided file
+    conda env create -f /tmp/environment.yml
+
+    # Create directories
     mkdir -p /tmp
     mkdir -p /local_scratch
+
 %environment
-    export PATH=/usr/local/bin:$PATH
+    export PATH=/opt/conda/envs/hpc/bin:$PATH
 
 %runscript
+    source activate hpc
     cd /local_scratch
