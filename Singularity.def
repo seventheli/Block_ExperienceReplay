@@ -16,8 +16,5 @@ From: python:3.9-slim-buster
 %environment
     export PATH=/usr/local/bin:$PATH
 
-%files
-    ./ /local_scratch
-
 %runscript
     cd /local_scratch
