@@ -17,8 +17,8 @@ from ray.rllib.algorithms.apex_dqn import ApexDQN
 from mlflow.exceptions import MlflowException
 from func_timeout import FunctionTimedOut
 
-# init_ray("./ray_config.yml")
-ray.init(address="auto")
+init_ray("./ray_config.yml")
+
 parser = argparse.ArgumentParser()
 parser.add_argument("-S", "--setting", dest="setting_path", type=str)
 parser.add_argument("-SBZ", "--sub_buffer_size", dest="sub_buffer_size", type=int, default=0)
