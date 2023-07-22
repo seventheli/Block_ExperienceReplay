@@ -14,7 +14,7 @@ def init_ray(ray_setting=None):
             settings = yaml.safe_load(file)
         ray.init(**settings, _system_config={"maximum_gcs_destroyed_actor_cached_count": 50})
     else:
-        ray.init()
+        ray.init("auto", _system_config={"maximum_gcs_destroyed_actor_cached_count": 50})
 
 
 def check_path(path):

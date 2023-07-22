@@ -17,7 +17,7 @@ from utils import init_ray, check_path, logs_with_timeout, convert_np_arrays
 from mlflow.exceptions import MlflowException
 from func_timeout import FunctionTimedOut
 
-init_ray("./ray_config.yml")
+init_ray()
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-S", "--setting", dest="setting_path", type=str)
