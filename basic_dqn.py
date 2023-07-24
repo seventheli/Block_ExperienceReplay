@@ -1,21 +1,27 @@
 import os
 import gym
+import ray
 import tqdm
 import json
 import pickle
 import argparse
-import datetime
 from os import path
 from dynaconf import Dynaconf
 from ray.rllib.algorithms.dqn import DQN
 from algorithms_with_statistics.basic_dqn import DQNWithLogging
 from replay_buffer.ber import BlockReplayBuffer
 from ray.rllib.env.wrappers.atari_wrappers import wrap_deepmind
-from utils import init_ray, convert_np_arrays, check_path
+from utils import convert_np_arrays, check_path
 
-init_ray("./ray_config.yml")
+ray.init(
+    num_cpus=15, num_gpus=1,
+    _temp_dir="/local_scratch",
+    _system_config={"maximum_gcs_destroyed_actor_cached_count": 200},
+    _memory=118111600640
+)
 
 parser = argparse.ArgumentParser()
+parser.add_argument("-R", "--run_name", dest="run_name", type=int)
 parser.add_argument("-S", "--setting", dest="setting_path", type=str)
 parser.add_argument("-L", "--with_er_logging", dest="er_logging", type=int, default=0)
 parser.add_argument("-SBZ", "--sub_buffer_size", dest="sub_buffer_size", type=int, default=0)
@@ -31,10 +37,10 @@ settings = Dynaconf(envvar_prefix="DYNACONF", settings_files=settings)
 hyper_parameters = settings.dqn.hyper_parameters.to_dict()
 if sub_buffer_size == 0:
     # Set run object
-    run_name = "DQN_ER_%s_%s" % (settings.dqn.env, datetime.datetime.now().strftime("%Y%m%d"))
+    run_name = "DQN_ER_%s_%d" % (settings.dqn.env, parser.parse_args().run_name)
 else:
     # Set run object
-    run_name = "DQN_BER_%s_%s" % (settings.dqn.env, datetime.datetime.now().strftime("%Y%m%d"))
+    run_name = "DQN_BER_%s_%d" % (settings.dqn.env, parser.parse_args().run_name)
     # Log parameters
     env_example = wrap_deepmind(gym.make(settings.dqn.env))
     # Set BER

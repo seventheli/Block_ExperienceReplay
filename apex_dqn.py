@@ -1,21 +1,26 @@
 import os
 import gym
+import ray
 import tqdm
 import json
 import pickle
 import argparse
-import datetime
 from os import path
 from dynaconf import Dynaconf
 from algorithms.apex_ddqn_pber import ApexDDQNWithDPBER
 from replay_buffer.mpber import MultiAgentPrioritizedBlockReplayBuffer
 from ray.rllib.env.wrappers.atari_wrappers import wrap_deepmind
-from utils import init_ray, check_path, convert_np_arrays
+from utils import check_path, convert_np_arrays
 from ray.rllib.algorithms.apex_dqn import ApexDQN
 
-init_ray("./ray_config.yml")
-
+ray.init(
+    num_cpus=15, num_gpus=1,
+    _temp_dir="/local_scratch",
+    _system_config={"maximum_gcs_destroyed_actor_cached_count": 200},
+    _memory=118111600640
+)
 parser = argparse.ArgumentParser()
+parser.add_argument("-R", "--run_name", dest="run_name", type=int)
 parser.add_argument("-S", "--setting", dest="setting_path", type=str)
 parser.add_argument("-SBZ", "--sub_buffer_size", dest="sub_buffer_size", type=int, default=0)
 
@@ -34,11 +39,11 @@ else:
 
 if sub_buffer_size == 0:
     # Set run object
-    run_name = run_name + "_" + settings.apex.env + "_DPER_" + datetime.datetime.now().strftime("%Y%m%d")
+    run_name = run_name + "_" + settings.apex.env + "_DPER_%d" % parser.parse_args().run_name
     algorithm = ApexDQN(config=hyper_parameters, env=settings.apex.env)
 else:
     # Set run object
-    run_name = run_name + "_" + settings.apex.env + "_DPBER_" + datetime.datetime.now().strftime("%Y%m%d")
+    run_name = run_name + "_" + settings.apex.env + "_DPBER_%d" % parser.parse_args().run_name
     env_example = wrap_deepmind(gym.make(settings.apex.env))
     # Set BER
     replay_buffer_config = {

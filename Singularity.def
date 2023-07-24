@@ -17,7 +17,6 @@ From: continuumio/miniconda3
 
 %environment
     export PATH=/opt/conda/envs/hpc/bin:$PATH
-    export RAY_LOG_DIR=/local_scratch/
 
 %runscript
     . /opt/conda/etc/profile.d/conda.sh

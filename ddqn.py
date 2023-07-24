@@ -1,10 +1,10 @@
 import os
 import gym
+import ray
 import tqdm
 import json
 import pickle
 import argparse
-import datetime
 from os import path
 from dynaconf import Dynaconf
 from ray.rllib.algorithms.dqn import DQN
@@ -13,11 +13,16 @@ from algorithms_with_statistics.ddqn_per import DDQNWithMPERAndLogging
 from algorithms.ddqn_pber import DDQNWithMPBER
 from replay_buffer.mpber import MultiAgentPrioritizedBlockReplayBuffer
 from ray.rllib.env.wrappers.atari_wrappers import wrap_deepmind
-from utils import init_ray, check_path, convert_np_arrays
+from utils import check_path, convert_np_arrays
 
-init_ray("./ray_config.yml")
-
+ray.init(
+    num_cpus=15, num_gpus=1,
+    _temp_dir="/local_scratch",
+    _system_config={"maximum_gcs_destroyed_actor_cached_count": 200},
+    _memory=118111600640
+)
 parser = argparse.ArgumentParser()
+parser.add_argument("-R", "--run_name", dest="run_name", type=int)
 parser.add_argument("-S", "--setting", dest="setting_path", type=str)
 parser.add_argument("-L", "--with_er_logging", dest="er_logging", type=int, default=0)
 parser.add_argument("-SBZ", "--sub_buffer_size", dest="sub_buffer_size", type=int, default=0)
@@ -33,14 +38,14 @@ settings = Dynaconf(envvar_prefix="DYNACONF", settings_files=settings)
 hyper_parameters = settings.dqn.hyper_parameters.to_dict()
 if sub_buffer_size == 0:
     # Set run object
-    run_name = "DDQN_PER_%s_%s" % (settings.dqn.env, datetime.datetime.now().strftime("%Y%m%d"))
+    run_name = "DDQN_PER_%s_%d" % (settings.dqn.env, parser.parse_args().run_name)
     if with_er_logging:
         algorithm = DDQNWithMPERAndLogging(config=hyper_parameters, env=settings.dqn.env)
     else:
         algorithm = DQN(config=hyper_parameters, env=settings.dqn.env)
 else:
     # Set run object
-    run_name = "DDQN_PBER_%s_%s" % (settings.dqn.env, datetime.datetime.now().strftime("%Y%m%d"))
+    run_name = "DDQN_PBER_%s_%d" % (settings.dqn.env, parser.parse_args().run_name)
     # Log parameters
     env_example = wrap_deepmind(gym.make(settings.dqn.env))
     # Set BER

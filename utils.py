@@ -23,10 +23,6 @@ def get_size(obj):
     return size
 
 
-sample_batch = ...  # Your SampleBatch object here
-print(get_size(sample_batch))
-
-
 def init_ray(ray_setting=None):
     if ray_setting is not None:
         with open(ray_setting, 'r') as file:
