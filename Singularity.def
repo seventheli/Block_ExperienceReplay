@@ -6,16 +6,20 @@ From: continuumio/miniconda3
     apt-get -y upgrade
     apt-get install -y libgl1-mesa-glx
     # Create a conda environment using the provided file
+    . /opt/conda/etc/profile.d/conda.sh   # Source the conda script
     conda env create -f /tmp/environment.yml
-    source activate hpc
+    conda activate hpc
     conda install -c conda-forge opencv
     # Create directories
-    mkdir -p /tmp
-    mkdir -p /local_scratch
+    mkdir -m 777 -p /tmp
+    mkdir -m 777 -p /local_scratch
+
 
 %environment
     export PATH=/opt/conda/envs/hpc/bin:$PATH
+    export RAY_LOG_DIR=/local_scratch/
 
 %runscript
-    source activate hpc
+    . /opt/conda/etc/profile.d/conda.sh
+    conda activate hpc
     cd /local_scratch
