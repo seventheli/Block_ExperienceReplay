@@ -32,5 +32,3 @@ dqn:
 log:
   log: 100
   max_time: 360000
-  save_checkout: /jmain02/home/J2AD006/jxb06/cxz46-jxb06/checkpoints/SpaceInvaders
-  save_file: /jmain02/home/J2AD006/jxb06/cxz46-jxb06/logging/SpaceInvaders

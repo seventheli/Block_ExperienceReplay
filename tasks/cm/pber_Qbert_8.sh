@@ -17,4 +17,5 @@ python $_path/ddqn.py \
     -S $_path/settings/ddqn/Qbert.yml \
     -R $SLURM_JOB_ID \
     -L $_log \
-    -C $_checkpoint
+    -C $_checkpoint \
+    -SBZ 8

@@ -32,5 +32,3 @@ apex:
 log:
   log: 100
   max_time: 360000
-  save_checkout: /jmain02/home/J2AD006/jxb06/jxc15-jxb06/checkpoints/BeamRider
-  save_file: /jmain02/home/J2AD006/jxb06/jxc15-jxb06/logging/BeamRider

@@ -19,14 +19,19 @@ ray.init(
     _system_config={"maximum_gcs_destroyed_actor_cached_count": 200},
     _memory=118111600640
 )
+
 parser = argparse.ArgumentParser()
 parser.add_argument("-R", "--run_name", dest="run_name", type=int)
 parser.add_argument("-S", "--setting", dest="setting_path", type=str)
+parser.add_argument("-L", "--log_path", dest="log_path", type=str)
+parser.add_argument("-C", "--checkpoint_path", dest="checkpoint_path", type=str)
 parser.add_argument("-SBZ", "--sub_buffer_size", dest="sub_buffer_size", type=int, default=0)
 
 sub_buffer_size = parser.parse_args().sub_buffer_size
 
 # Config path
+log_path = parser.parse_args().log_path
+checkpoint_path = parser.parse_args().checkpoint_path
 settings = parser.parse_args().setting_path
 settings = Dynaconf(envvar_prefix="DYNACONF", settings_files=settings)
 
@@ -64,12 +69,14 @@ else:
 print(algorithm.config.to_dict()["replay_buffer_config"])
 
 # Check path available
-check_path(settings.log.save_file)
-log_path = path.join(settings.log.save_file, run_name)
 check_path(log_path)
-check_path(settings.log.save_checkout)
-checkpoint_path = path.join(settings.log.save_checkout, run_name)
+log_path = path.join(log_path, run_name)
+check_path(log_path)
 check_path(checkpoint_path)
+checkpoint_path = path.join(checkpoint_path, run_name)
+check_path(checkpoint_path)
+
+print("log path: %s \n check_path: %s" % (log_path, checkpoint_path))
 
 with open(os.path.join(checkpoint_path, "%s_config.pyl" % run_name), "wb") as f:
     _ = algorithm.config.to_dict()

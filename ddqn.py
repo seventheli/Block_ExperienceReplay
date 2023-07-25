@@ -8,8 +8,6 @@ import argparse
 from os import path
 from dynaconf import Dynaconf
 from ray.rllib.algorithms.dqn import DQN
-from algorithms_with_statistics.ddqn_pber import DDQNWithMPBERAndLogging
-from algorithms_with_statistics.ddqn_per import DDQNWithMPERAndLogging
 from algorithms.ddqn_pber import DDQNWithMPBER
 from replay_buffer.mpber import MultiAgentPrioritizedBlockReplayBuffer
 from ray.rllib.env.wrappers.atari_wrappers import wrap_deepmind
@@ -21,16 +19,19 @@ ray.init(
     _system_config={"maximum_gcs_destroyed_actor_cached_count": 200},
     _memory=118111600640
 )
+
 parser = argparse.ArgumentParser()
 parser.add_argument("-R", "--run_name", dest="run_name", type=int)
 parser.add_argument("-S", "--setting", dest="setting_path", type=str)
-parser.add_argument("-L", "--with_er_logging", dest="er_logging", type=int, default=0)
+parser.add_argument("-L", "--log_path", dest="log_path", type=str)
+parser.add_argument("-C", "--checkpoint_path", dest="checkpoint_path", type=str)
 parser.add_argument("-SBZ", "--sub_buffer_size", dest="sub_buffer_size", type=int, default=0)
 
-with_er_logging = parser.parse_args().er_logging
 sub_buffer_size = parser.parse_args().sub_buffer_size
 
 # Config path
+log_path = parser.parse_args().log_path
+checkpoint_path = parser.parse_args().checkpoint_path
 settings = parser.parse_args().setting_path
 settings = Dynaconf(envvar_prefix="DYNACONF", settings_files=settings)
 
@@ -39,10 +40,7 @@ hyper_parameters = settings.dqn.hyper_parameters.to_dict()
 if sub_buffer_size == 0:
     # Set run object
     run_name = "DDQN_PER_%s_%d" % (settings.dqn.env, parser.parse_args().run_name)
-    if with_er_logging:
-        algorithm = DDQNWithMPERAndLogging(config=hyper_parameters, env=settings.dqn.env)
-    else:
-        algorithm = DQN(config=hyper_parameters, env=settings.dqn.env)
+    algorithm = DQN(config=hyper_parameters, env=settings.dqn.env)
 else:
     # Set run object
     run_name = "DDQN_PBER_%s_%d" % (settings.dqn.env, parser.parse_args().run_name)
@@ -59,20 +57,19 @@ else:
         "replay_sequence_length": 1,
     }
     hyper_parameters["replay_buffer_config"] = replay_buffer_config
-    if with_er_logging:
-        algorithm = DDQNWithMPBERAndLogging(config=hyper_parameters, env=settings.dqn.env)
-    else:
-        algorithm = DDQNWithMPBER(config=hyper_parameters, env=settings.dqn.env)
+    algorithm = DDQNWithMPBER(config=hyper_parameters, env=settings.dqn.env)
 
 print(algorithm.config.to_dict()["replay_buffer_config"])
 
 # Check path available
-check_path(settings.log.save_file)
-log_path = path.join(settings.log.save_file, run_name)
 check_path(log_path)
-check_path(settings.log.save_checkout)
-checkpoint_path = path.join(settings.log.save_checkout, run_name)
+log_path = path.join(log_path, run_name)
+check_path(log_path)
 check_path(checkpoint_path)
+checkpoint_path = path.join(checkpoint_path, run_name)
+check_path(checkpoint_path)
+
+print("log path: %s \n check_path: %s" % (log_path, checkpoint_path))
 
 with open(os.path.join(checkpoint_path, "%s_config.pyl" % run_name), "wb") as f:
     _ = algorithm.config.to_dict()

@@ -13,8 +13,9 @@ _checkpoint="/jmain02/home/J2AD006/jxb06/cxz46-jxb06/checkpoints/Qbert"
 cd $_path || exit
 
 # Run Python script
-python $_path/ddqn.py \
-    -S $_path/settings/ddqn/Qbert.yml \
+python $_path/basic_dqn.py \
+    -S $_path/settings/basic_dqn/Qbert.yml \
     -R $SLURM_JOB_ID \
     -L $_log \
-    -C $_checkpoint
+    -C $_checkpoint \
+    -SBZ 8

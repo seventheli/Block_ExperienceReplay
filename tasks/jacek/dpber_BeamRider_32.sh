@@ -18,4 +18,4 @@ python $_path/apex_dqn.py \
     -R $SLURM_JOB_ID \
     -L $_log \
     -C $_checkpoint
-
+    -SBZ 32
