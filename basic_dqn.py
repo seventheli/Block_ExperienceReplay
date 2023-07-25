@@ -10,7 +10,7 @@ from dynaconf import Dynaconf
 from ray.rllib.algorithms.dqn import DQN
 from replay_buffer.ber import BlockReplayBuffer
 from ray.rllib.env.wrappers.atari_wrappers import wrap_deepmind
-from utils import convert_np_arrays, check_path
+from utils import convert_np_arrays, check_path, custom_logger_creator
 
 ray.init(
     num_cpus=15, num_gpus=1,
@@ -55,7 +55,7 @@ else:
     }
     hyper_parameters["replay_buffer_config"] = replay_buffer_config
 
-algorithm = DQN(config=hyper_parameters, env=settings.dqn.env)
+algorithm = DQN(config=hyper_parameters, env=settings.dqn.env, logger_creator=custom_logger_creator)
 
 print(algorithm.config.to_dict()["replay_buffer_config"])
 
