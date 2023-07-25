@@ -15,9 +15,9 @@ from utils import check_path, convert_np_arrays
 
 ray.init(
     num_cpus=15, num_gpus=1,
+    include_dashboard=False,
     _temp_dir="/local_scratch",
     _system_config={"maximum_gcs_destroyed_actor_cached_count": 200},
-    _memory=118111600640
 )
 
 parser = argparse.ArgumentParser()

@@ -14,7 +14,7 @@ cd $_path || exit
 
 # Run Python script
 python $_path/apex_dqn.py \
-    -S $_path/settings/apex_dqn/Qbert.yml \
+    -S $_path/settings/apex_ddqn/Qbert.yml \
     -R $SLURM_JOB_ID \
     -L $_log \
     -C $_checkpoint
