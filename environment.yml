@@ -18,11 +18,9 @@ dependencies:
     - ray[tune]==2.2.0
     - ray[air]==2.2.0
     - ale-py==0.7.5
-    - gym==0.23.0
-    - gym-notices==0.0.7
-    - gym[accept-rom-license]==0.23.0
-    - Gymnasium==0.26.3
-    - gymnasium-notices==0.0.1
+    - gym<0.24.0
+    - gym[atari]<0.24.0
+    - gym[accept-rom-license]<0.24.0
     - rfc3339==6.2
     - numpy==1.23.5
     - pydantic<2

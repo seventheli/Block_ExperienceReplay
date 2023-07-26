@@ -11,6 +11,7 @@ from ray.rllib.algorithms.dqn import DQN
 from algorithms.ddqn_pber import DDQNWithMPBER
 from replay_buffer.mpber import MultiAgentPrioritizedBlockReplayBuffer
 from ray.rllib.env.wrappers.atari_wrappers import wrap_deepmind
+from ray.tune.logger import UnifiedLogger
 from utils import check_path, convert_np_arrays
 
 ray.init(
@@ -37,6 +38,8 @@ settings = Dynaconf(envvar_prefix="DYNACONF", settings_files=settings)
 
 # Set hyper parameters
 hyper_parameters = settings.dqn.hyper_parameters.to_dict()
+hyper_parameters["logger_config"] = {"type": UnifiedLogger, "logdir": checkpoint_path}
+
 if sub_buffer_size == 0:
     # Set run object
     run_name = "DDQN_PER_%s_%d" % (settings.dqn.env, parser.parse_args().run_name)

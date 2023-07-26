@@ -6,12 +6,6 @@ import yaml
 import numpy as np
 from gym import spaces
 from typing import Dict, Tuple, Union
-from ray.tune.logger import UnifiedLogger
-
-def custom_logger_creator(config):
-    # `config` is a LoggerContext object.
-    loggers = [UnifiedLogger(config, logdir=config["checkpoints"])]
-    return loggers
 
 
 def get_size(obj):

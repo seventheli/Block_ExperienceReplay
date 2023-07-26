@@ -10,8 +10,9 @@ from dynaconf import Dynaconf
 from algorithms.apex_ddqn_pber import ApexDDQNWithDPBER
 from replay_buffer.mpber import MultiAgentPrioritizedBlockReplayBuffer
 from ray.rllib.env.wrappers.atari_wrappers import wrap_deepmind
-from utils import check_path, convert_np_arrays
 from ray.rllib.algorithms.apex_dqn import ApexDQN
+from ray.tune.logger import UnifiedLogger
+from utils import check_path, convert_np_arrays
 
 ray.init(
     num_cpus=15, num_gpus=1,
@@ -37,6 +38,8 @@ settings = Dynaconf(envvar_prefix="DYNACONF", settings_files=settings)
 
 # Set hyper parameters
 hyper_parameters = settings.apex.hyper_parameters.to_dict()
+hyper_parameters["logger_config"] = {"type": UnifiedLogger, "logdir": checkpoint_path}
+print("log path: %s \n check_path: %s" % (log_path, checkpoint_path))
 if hyper_parameters["double_q"]:
     run_name = "APEX_DDQN"
 else:
@@ -66,8 +69,6 @@ else:
     hyper_parameters["train_batch_size"] = int(hyper_parameters["train_batch_size"] / sub_buffer_size)
     algorithm = ApexDDQNWithDPBER(config=hyper_parameters, env=settings.apex.env)
 
-print(algorithm.config.to_dict()["replay_buffer_config"])
-
 # Check path available
 check_path(log_path)
 log_path = path.join(log_path, run_name)
@@ -76,7 +77,8 @@ check_path(checkpoint_path)
 checkpoint_path = path.join(checkpoint_path, run_name)
 check_path(checkpoint_path)
 
-print("log path: %s \n check_path: %s" % (log_path, checkpoint_path))
+print(algorithm.config.to_dict()["replay_buffer_config"])
+
 
 with open(os.path.join(checkpoint_path, "%s_config.pyl" % run_name), "wb") as f:
     _ = algorithm.config.to_dict()
