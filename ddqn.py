@@ -20,7 +20,6 @@ from mlflow.exceptions import MlflowException
 from func_timeout import FunctionTimedOut
 
 init_ray("./ray_config.yml")
-
 parser = argparse.ArgumentParser()
 parser.add_argument("-S", "--setting", dest="setting_path", type=str)
 parser.add_argument("-L", "--with_er_logging", dest="er_logging", type=int, default=0)
