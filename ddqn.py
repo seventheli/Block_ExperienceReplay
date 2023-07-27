@@ -23,9 +23,9 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-S", "--setting", dest="setting_path", type=str)
 parser.add_argument("-L", "--with_er_logging", dest="er_logging", type=int, default=0)
 parser.add_argument("-SBZ", "--sub_buffer_size", dest="sub_buffer_size", type=int, default=0)
-parser.add_argument("-R", "--ray", dest="use single ray", type=int, default=0)
+parser.add_argument("-R", "--ray", dest="single_ray", type=int, default=0)
 
-if parser.parse_args().ray == 0:
+if parser.parse_args().single_ray == 0:
     init_ray()
 else:
     init_ray("./ray_config.yml")
