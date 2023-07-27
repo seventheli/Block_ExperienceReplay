@@ -19,11 +19,16 @@ from utils import init_ray, check_path, logs_with_timeout, convert_np_arrays
 from mlflow.exceptions import MlflowException
 from func_timeout import FunctionTimedOut
 
-init_ray("./ray_config.yml")
 parser = argparse.ArgumentParser()
 parser.add_argument("-S", "--setting", dest="setting_path", type=str)
 parser.add_argument("-L", "--with_er_logging", dest="er_logging", type=int, default=0)
 parser.add_argument("-SBZ", "--sub_buffer_size", dest="sub_buffer_size", type=int, default=0)
+parser.add_argument("-R", "--ray", dest="use single ray", type=int, default=0)
+
+if parser.parse_args().ray == 0:
+    init_ray()
+else:
+    init_ray("./ray_config.yml")
 
 with_er_logging = parser.parse_args().er_logging
 sub_buffer_size = parser.parse_args().sub_buffer_size
@@ -46,7 +51,8 @@ if sub_buffer_size == 0:
                                   tags={"mlflow.user": settings.mlflow.user})
     # Log parameters
     mlflow.log_params(hyper_parameters["replay_buffer_config"])
-    mlflow.log_params({key: hyper_parameters[key] for key in hyper_parameters.keys() if key not in ["replay_buffer_config"]})
+    mlflow.log_params(
+        {key: hyper_parameters[key] for key in hyper_parameters.keys() if key not in ["replay_buffer_config"]})
     if with_er_logging:
         algorithm = DDQNWithMPERAndLogging(config=hyper_parameters, env=settings.dqn.env)
     else:
@@ -63,7 +69,8 @@ else:
         "type": "MultiAgentPrioritizedBlockReplayBuffer",
         "sub_buffer_size": sub_buffer_size,
     })
-    mlflow.log_params({key: hyper_parameters[key] for key in hyper_parameters.keys() if key not in ["replay_buffer_config"]})
+    mlflow.log_params(
+        {key: hyper_parameters[key] for key in hyper_parameters.keys() if key not in ["replay_buffer_config"]})
     # Set BER
     replay_buffer_config = {
         **settings.dqn.hyper_parameters.replay_buffer_config.to_dict(),

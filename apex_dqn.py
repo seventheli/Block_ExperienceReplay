@@ -17,10 +17,15 @@ from ray.rllib.algorithms.apex_dqn import ApexDQN
 from mlflow.exceptions import MlflowException
 from func_timeout import FunctionTimedOut
 
-init_ray("./ray_config.yml")
 parser = argparse.ArgumentParser()
 parser.add_argument("-S", "--setting", dest="setting_path", type=str)
 parser.add_argument("-SBZ", "--sub_buffer_size", dest="sub_buffer_size", type=int, default=0)
+parser.add_argument("-R", "--ray", dest="use single ray", type=int, default=0)
+
+if parser.parse_args().ray == 0:
+    init_ray()
+else:
+    init_ray("./ray_config.yml")
 
 sub_buffer_size = parser.parse_args().sub_buffer_size
 
@@ -47,7 +52,8 @@ if sub_buffer_size == 0:
                                   tags={"mlflow.user": settings.mlflow.user})
     # Log parameters
     mlflow.log_params(hyper_parameters["replay_buffer_config"])
-    mlflow.log_params({key: hyper_parameters[key] for key in hyper_parameters.keys() if key not in ["replay_buffer_config"]})
+    mlflow.log_params(
+        {key: hyper_parameters[key] for key in hyper_parameters.keys() if key not in ["replay_buffer_config"]})
     algorithm = ApexDQN(config=hyper_parameters, env=settings.apex.env)
 else:
     # Set run object
@@ -61,7 +67,8 @@ else:
         "type": "MultiAgentPrioritizedBlockReplayBuffer",
         "sub_buffer_size": sub_buffer_size,
     })
-    mlflow.log_params({key: hyper_parameters[key] for key in hyper_parameters.keys() if key not in ["replay_buffer_config"]})
+    mlflow.log_params(
+        {key: hyper_parameters[key] for key in hyper_parameters.keys() if key not in ["replay_buffer_config"]})
     # Set BER
     replay_buffer_config = {
         **settings.apex.hyper_parameters.replay_buffer_config.to_dict(),
