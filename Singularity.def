@@ -1,19 +1,25 @@
 Bootstrap: docker
 From: continuumio/miniconda3
 
+%files
+    ./environment.yml /opt/
+
 %post
     apt-get -y update
     apt-get -y upgrade
     apt-get install -y libgl1-mesa-glx
     # Create a conda environment using the provided file
     . /opt/conda/etc/profile.d/conda.sh   # Source the conda script
-    conda env create -f /tmp/environment.yml
+    conda env create -f /opt/environment.yml
     conda activate ber
     conda install -c conda-forge opencv
-    # Create directories
-    mkdir -m 777 -p /tmp
-    mkdir -m 777 -p /local_scratch
 
 
 %environment
     export PATH=/opt/conda/envs/ber/bin:$PATH
+
+%startscript
+    # Activate conda environment and run nvidia-smi
+    . /opt/conda/etc/profile.d/conda.sh
+    conda activate ber
+    nvidia-smi

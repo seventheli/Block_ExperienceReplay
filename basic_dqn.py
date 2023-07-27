@@ -14,7 +14,7 @@ from ray.tune.logger import UnifiedLogger
 from utils import convert_np_arrays, check_path
 
 ray.init(
-    num_cpus=15, num_gpus=1,
+    num_cpus=6, num_gpus=1,
     include_dashboard=False,
     _system_config={"maximum_gcs_destroyed_actor_cached_count": 200},
 )
