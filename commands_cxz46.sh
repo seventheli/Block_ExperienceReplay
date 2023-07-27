@@ -3,9 +3,7 @@ sbatch --mem=100G \
        --cpus-per-task=15 \
        --time=4-10:00:00 \
        -p small \
-       /jmain02/home/J2AD006/jxb06/cxz46-jxb06/singbatch \
-       /jmain02/home/J2AD006/jxb06/cxz46-jxb06/image_conda.sif \
-       /jmain02/home/J2AD006/jxb06/cxz46-jxb06/Block_ExperienceReplay/tasks/cm/per_Breakout.sh
+       /jmain02/home/J2AD006/jxb06/cxz46-jxb06/Block_ExperienceReplay/tasks/Test_apex_2.sh
 
 sbatch --mem=100G \
        --gres=gpu:1 \

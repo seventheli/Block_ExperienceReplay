@@ -8,7 +8,7 @@ From: continuumio/miniconda3
     # Create a conda environment using the provided file
     . /opt/conda/etc/profile.d/conda.sh   # Source the conda script
     conda env create -f /tmp/environment.yml
-    conda activate hpc
+    conda activate ber
     conda install -c conda-forge opencv
     # Create directories
     mkdir -m 777 -p /tmp
@@ -16,9 +16,4 @@ From: continuumio/miniconda3
 
 
 %environment
-    export PATH=/opt/conda/envs/hpc/bin:$PATH
-
-%runscript
-    . /opt/conda/etc/profile.d/conda.sh
-    conda activate hpc
-    cd /local_scratch
+    export PATH=/opt/conda/envs/ber/bin:$PATH
