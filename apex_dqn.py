@@ -1,8 +1,8 @@
 import os
-import ray
 import gym
 import tqdm
 import json
+import torch
 import mlflow
 import pickle
 import argparse
@@ -17,6 +17,7 @@ from ray.rllib.algorithms.apex_dqn import ApexDQN
 from mlflow.exceptions import MlflowException
 from func_timeout import FunctionTimedOut
 
+torch.manual_seed(10)
 parser = argparse.ArgumentParser()
 parser.add_argument("-S", "--setting", dest="setting_path", type=str)
 parser.add_argument("-SBZ", "--sub_buffer_size", dest="sub_buffer_size", type=int, default=0)
