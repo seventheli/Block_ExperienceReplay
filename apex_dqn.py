@@ -84,6 +84,9 @@ with open(os.path.join(checkpoint_path, "%s_config.pyl" % run_name), "wb") as f:
     _.pop("multiagent")
     pickle.dump(_, f)
 
+checkpoint_path = path.join(checkpoint_path, "/results")
+check_path(checkpoint_path)
+
 # Run algorithms
 keys_to_extract = {"episode_reward_max", "episode_reward_min", "episode_reward_mean"}
 for i in tqdm.tqdm(range(1, 10000)):

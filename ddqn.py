@@ -71,12 +71,17 @@ check_path(checkpoint_path)
 checkpoint_path = path.join(checkpoint_path, run_name)
 check_path(checkpoint_path)
 
+
+
 print("log path: %s \n check_path: %s" % (log_path, checkpoint_path))
 
 with open(os.path.join(checkpoint_path, "%s_config.pyl" % run_name), "wb") as f:
     _ = algorithm.config.to_dict()
     _.pop("multiagent")
     pickle.dump(_, f)
+
+checkpoint_path = path.join(checkpoint_path, "/results")
+check_path(checkpoint_path)
 
 # Run algorithms
 keys_to_extract = {"episode_reward_max", "episode_reward_min", "episode_reward_mean"}
