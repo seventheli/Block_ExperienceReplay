@@ -1,4 +1,4 @@
-name: ber
+name: hpc
 channels:
   - defaults
   - conda-forge
