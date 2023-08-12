@@ -31,4 +31,4 @@ apex:
   run: apex
 log:
   log: 100
-  max_time: 10800
+  max_time: 7200

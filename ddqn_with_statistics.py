@@ -31,7 +31,6 @@ log_path = parser.parse_args().log_path
 checkpoint_path = parser.parse_args().checkpoint_path
 settings = parser.parse_args().setting_path
 settings = Dynaconf(envvar_prefix="DYNACONF", settings_files=settings)
-settings.log.max_time = 18000
 # Set hyper parameters
 hyper_parameters = settings.dqn.hyper_parameters.to_dict()
 hyper_parameters["logger_config"] = {"type": UnifiedLogger, "logdir": checkpoint_path}

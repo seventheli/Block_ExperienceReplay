@@ -31,4 +31,4 @@ dqn:
   run: DQN
 log:
   log: 100
-  max_time: 86400
+  max_time: 7200
