@@ -27,8 +27,8 @@ apex:
       type: MultiAgentPrioritizedReplayBuffer
     rollout_fragment_length: 20
     target_network_update_freq: 50000
-    train_batch_size: 128
-  run: APEX
+    train_batch_size: 2048
+  run: apex
 log:
   log: 100
-  max_time: 86400
+  max_time: 10800
