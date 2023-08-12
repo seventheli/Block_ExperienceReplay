@@ -14,11 +14,7 @@ from ray.rllib.algorithms.apex_dqn import ApexDQN
 from ray.tune.logger import UnifiedLogger
 from utils import check_path, convert_np_arrays
 
-ray.init(
-    num_cpus=10, num_gpus=1,
-    include_dashboard=False,
-    _system_config={"maximum_gcs_destroyed_actor_cached_count": 200},
-)
+ray.init("auto")
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-R", "--run_name", dest="run_name", type=int)
