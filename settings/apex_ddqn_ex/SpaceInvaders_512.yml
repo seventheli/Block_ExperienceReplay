@@ -15,11 +15,10 @@ apex:
     n_step: 3
     noisy: false
     num_atoms: 1
-    num_cpus_per_worker: 1
     num_envs_per_worker: 8
     num_gpus: 1
     num_gpus_per_worker: 0
-    num_workers: 4
+    num_workers: 8
     replay_buffer_config:
       capacity: 1000000
       prioritized_replay_alpha: 0.5
