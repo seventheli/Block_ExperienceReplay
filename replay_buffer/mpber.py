@@ -114,7 +114,7 @@ class MultiAgentPrioritizedBlockReplayBuffer(MultiAgentPrioritizedReplayBuffer):
             replay_zero_init_states: Whether the initial states in the
                 buffer (if replay_sequence_length > 0) are alwayas 0.0 or
                 should be updated with the previous train_batch state outputs.
-            underlying_buffer_config: B config that contains all necessary
+            underlying_buffer_config: A config that contains all necessary
                 constructor arguments and arguments for methods to call on
                 the underlying buffers. This replaces the standard behaviour
                 of the underlying PrioritizedReplayBuffer. The config
