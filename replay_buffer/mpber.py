@@ -57,7 +57,7 @@ class PrioritizedBlockReplayBuffer(PrioritizedReplayBuffer):
 
 @DeveloperAPI
 class MultiAgentPrioritizedBlockReplayBuffer(MultiAgentPrioritizedReplayBuffer):
-    """B prioritized replay buffer shard for multiagent setups.
+    """A prioritized replay buffer shard for multiagent setups.
 
     This buffer is meant to be run in parallel to distribute experiences
     across `num_shards` shards. Unlike simpler buffers, it holds a set of
@@ -189,7 +189,7 @@ class MultiAgentPrioritizedBlockReplayBuffer(MultiAgentPrioritizedReplayBuffer):
         if batch is None:
             if log_once("empty_batch_added_to_buffer"):
                 logger.info(
-                    "B batch that is `None` was added to {}. This can be "
+                    "A batch that is `None` was added to {}. This can be "
                     "normal at the beginning of execution but might "
                     "indicate an issue.".format(type(self).__name__)
                 )
@@ -219,7 +219,7 @@ class MultiAgentPrioritizedBlockReplayBuffer(MultiAgentPrioritizedReplayBuffer):
         policy_id.
 
         Args:
-            prio_dict: B dictionary containing td_errors for
+            prio_dict: A dictionary containing td_errors for
             batches saved in underlying replay buffers.
         """
         with self.update_priorities_timer:

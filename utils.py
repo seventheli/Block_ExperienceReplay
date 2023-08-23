@@ -5,6 +5,7 @@ import ray
 import yaml
 import numpy as np
 from gym import spaces
+from func_timeout import func_set_timeout
 from typing import Dict, Tuple, Union
 
 
@@ -29,12 +30,28 @@ def init_ray(ray_setting=None):
             settings = yaml.safe_load(file)
         ray.init(**settings)
     else:
-        ray.init()
+        ray.init("auto")
 
 
 def check_path(path):
     if not os.path.exists(path):
         os.makedirs(path)
+
+
+@func_set_timeout(5)
+def log_with_timeout(client, run_id, key, value, step):
+    try:
+        client.log_metric(run_id, key=key, value=value, step=step)
+    except:
+        pass
+
+
+@func_set_timeout(5)
+def logs_with_timeout(data, step):
+    try:
+        mlflow.log_metrics(data, step)
+    except:
+        pass
 
 
 def convert_np_arrays(obj):
