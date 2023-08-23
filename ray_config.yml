@@ -1,0 +1,4 @@
+num_gpus:
+  1
+num_cpus:
+  10

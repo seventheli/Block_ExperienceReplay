@@ -1,21 +1,36 @@
 import os
+import sys
+import gc
 import ray
 import yaml
-import mlflow
 import numpy as np
 from gym import spaces
 from func_timeout import func_set_timeout
 from typing import Dict, Tuple, Union
 
 
-def init_ray(checkpoint_path="./checkpoint/", ray_setting=None):
-    check_path(checkpoint_path)
+def get_size(obj):
+    marked = {id(obj)}
+    obj_q = [obj]
+    size = 0
+
+    while obj_q:
+        size += sum(sys.getsizeof(i) for i in obj_q)
+        all_refr = ((id(o), o) for o in gc.get_referents(*obj_q))
+        new_refr = {o_id: o for o_id, o in all_refr if o_id not in marked and not isinstance(o, type)}
+        obj_q = new_refr.values()
+        marked.update(new_refr.keys())
+
+    return size
+
+
+def init_ray(ray_setting=None):
     if ray_setting is not None:
         with open(ray_setting, 'r') as file:
             settings = yaml.safe_load(file)
         ray.init(**settings)
     else:
-        ray.init()
+        ray.init("auto")
 
 
 def check_path(path):
@@ -32,9 +47,9 @@ def log_with_timeout(client, run_id, key, value, step):
 
 
 @func_set_timeout(5)
-def logs_with_timeout(data):
+def logs_with_timeout(data, step):
     try:
-        mlflow.log_metrics(data)
+        mlflow.log_metrics(data, step)
     except:
         pass
 

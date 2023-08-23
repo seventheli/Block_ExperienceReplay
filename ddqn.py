@@ -7,15 +7,15 @@ import pickle
 import argparse
 from os import path
 from dynaconf import Dynaconf
-from algorithms.apex_ddqn_pber import ApexDDQNWithDPBER
+from ray.rllib.algorithms.dqn import DQN
+from algorithms.ddqn_pber import DDQNWithMPBER
 from replay_buffer.mpber import MultiAgentPrioritizedBlockReplayBuffer
 from ray.rllib.env.wrappers.atari_wrappers import wrap_deepmind
-from ray.rllib.algorithms.apex_dqn import ApexDQN
 from ray.tune.logger import UnifiedLogger
 from utils import check_path, convert_np_arrays
 
 ray.init(
-    num_cpus=10, num_gpus=1,
+    num_cpus=6, num_gpus=1,
     include_dashboard=False,
     _system_config={"maximum_gcs_destroyed_actor_cached_count": 200},
 )
@@ -36,37 +36,32 @@ settings = parser.parse_args().setting_path
 settings = Dynaconf(envvar_prefix="DYNACONF", settings_files=settings)
 
 # Set hyper parameters
-hyper_parameters = settings.apex.hyper_parameters.to_dict()
+hyper_parameters = settings.dqn.hyper_parameters.to_dict()
 hyper_parameters["logger_config"] = {"type": UnifiedLogger, "logdir": checkpoint_path}
-print("log path: %s \n check_path: %s" % (log_path, checkpoint_path))
-if hyper_parameters["double_q"]:
-    run_name = "APEX_DDQN"
-else:
-    run_name = "APEX_DQN"
 
 if sub_buffer_size == 0:
     # Set run object
-    run_name = run_name + "_" + settings.apex.env + "_DPER_%d" % parser.parse_args().run_name
-    algorithm = ApexDQN(config=hyper_parameters, env=settings.apex.env)
+    run_name = "DDQN_PER_%s_%d" % (settings.dqn.env, parser.parse_args().run_name)
+    algorithm = DQN(config=hyper_parameters, env=settings.dqn.env)
 else:
     # Set run object
-    run_name = run_name + "_" + settings.apex.env + "_DPBER_%d" % parser.parse_args().run_name
-    env_example = wrap_deepmind(gym.make(settings.apex.env))
+    run_name = "DDQN_PBER_%s_%d" % (settings.dqn.env, parser.parse_args().run_name)
+    # Log parameters
+    env_example = wrap_deepmind(gym.make(settings.dqn.env))
     # Set BER
     replay_buffer_config = {
-        **settings.apex.hyper_parameters.replay_buffer_config.to_dict(),
+        **settings.dqn.hyper_parameters.replay_buffer_config.to_dict(),
         "type": MultiAgentPrioritizedBlockReplayBuffer,
-        "capacity": int(settings.apex.hyper_parameters.replay_buffer_config.capacity),
         "obs_space": env_example.observation_space,
         "action_space": env_example.action_space,
         "sub_buffer_size": sub_buffer_size,
         "worker_side_prioritization": False,
-        "replay_buffer_shards_colocated_with_driver": True,
-        "rollout_fragment_length": sub_buffer_size
+        "replay_sequence_length": 1,
     }
     hyper_parameters["replay_buffer_config"] = replay_buffer_config
-    hyper_parameters["train_batch_size"] = int(hyper_parameters["train_batch_size"] / sub_buffer_size)
-    algorithm = ApexDDQNWithDPBER(config=hyper_parameters, env=settings.apex.env)
+    algorithm = DDQNWithMPBER(config=hyper_parameters, env=settings.dqn.env)
+
+print(algorithm.config.to_dict()["replay_buffer_config"])
 
 # Check path available
 check_path(log_path)
@@ -76,8 +71,9 @@ check_path(checkpoint_path)
 checkpoint_path = path.join(checkpoint_path, run_name)
 check_path(checkpoint_path)
 
-print(algorithm.config.to_dict()["replay_buffer_config"])
 
+
+print("log path: %s \n check_path: %s" % (log_path, checkpoint_path))
 
 with open(os.path.join(checkpoint_path, "%s_config.pyl" % run_name), "wb") as f:
     _ = algorithm.config.to_dict()
