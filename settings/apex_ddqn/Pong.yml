@@ -20,9 +20,9 @@ apex:
     n_step: 3
     num_atoms: 1
     num_cpus_per_worker: 1
-    num_envs_per_worker: 5
+    num_envs_per_worker: 10
     num_gpus: 1
-    num_gpus_per_worker: 0.01
+    num_gpus_per_worker: 0
     num_workers: 8
     replay_buffer_config:
       capacity: 1000000
