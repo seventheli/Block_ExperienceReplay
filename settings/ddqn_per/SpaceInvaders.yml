@@ -1,7 +1,7 @@
 mlflow:
   experiment: "SpaceInvaders"
   url: "https://seventheli-mlflow.eu.cpolar.io/"
-  user: "AutoDL"
+  user: "UD2"
 dqn:
   env: SpaceInvadersNoFrameskip
   run: DQN

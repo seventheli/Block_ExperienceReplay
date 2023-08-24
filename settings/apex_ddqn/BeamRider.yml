@@ -1,7 +1,7 @@
 mlflow:
   experiment: "BeamRider"
   url: "https://seventheli-mlflow.eu.cpolar.io/"
-  user: "AutoDL"
+  user: "UD2"
 apex:
   env: BeamRiderNoFrameskip
   run: APEX
