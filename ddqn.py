@@ -27,18 +27,17 @@ parser.add_argument("-L", "--log_path", dest="log_path", type=str)
 parser.add_argument("-C", "--checkpoint_path", dest="checkpoint_path", type=str)
 parser.add_argument("-SBZ", "--sub_buffer_size", dest="sub_buffer_size", type=int, default=0)
 parser.add_argument("-R", "--ray", dest="single_ray", type=int, default=0)
+parser.add_argument("-E", "--er_logging", dest="er_logging", type=int, default=0)
 
 if parser.parse_args().single_ray == 0:
     init_ray()
 else:
     init_ray("./ray_config.yml")
 
-with_er_logging = parser.parse_args().er_logging
-sub_buffer_size = parser.parse_args().sub_buffer_size
-
-# Config path
+# Configs
 log_path = parser.parse_args().log_path
 checkpoint_path = parser.parse_args().checkpoint_path
+with_er_logging = parser.parse_args().er_logging
 settings = parser.parse_args().setting_path
 settings = Dynaconf(envvar_prefix="DYNACONF", settings_files=settings)
 
@@ -48,10 +47,10 @@ mlflow.set_experiment(experiment_name=settings.mlflow.experiment)
 mlflow_client = mlflow.tracking.MlflowClient()
 
 # Set hyper parameters
+
 hyper_parameters = settings.dqn.hyper_parameters.to_dict()
 hyper_parameters["logger_config"] = {"type": UnifiedLogger, "logdir": checkpoint_path}
 print("log path: %s \n check_path: %s" % (log_path, checkpoint_path))
-
 
 if sub_buffer_size == 0:
     # Set run object
