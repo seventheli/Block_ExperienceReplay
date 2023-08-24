@@ -1,6 +1,6 @@
 mlflow:
   experiment: "BeamRider"
-  url: "https://seventheli-mlflow.eu.cpolar.io/"
+  url: "http://127.0.0.1:9999"
   user: "UD2"
 apex:
   env: BeamRiderNoFrameskip
