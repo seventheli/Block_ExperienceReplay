@@ -123,7 +123,7 @@ def update_priorities_in_replay_buffer(
         replay_buffer.update_priorities(prio_dict)
 
 
-class DDQNWithMPBERAndLogging(DQN):
+class DDQNWithMPBERAndERLogging(DQN):
     time_usage = {
         "store": 0,
         "sample": 0,
@@ -133,7 +133,7 @@ class DDQNWithMPBERAndLogging(DQN):
     }
 
     def _init(self, config: AlgorithmConfigDict, env_creator: EnvCreator) -> None:
-        super(DDQNWithMPBERAndLogging, self)._init(config, env_creator)
+        super(DDQNWithMPBERAndERLogging, self)._init(config, env_creator)
 
     @override(SimpleQ)
     def training_step(self) -> ResultDict:

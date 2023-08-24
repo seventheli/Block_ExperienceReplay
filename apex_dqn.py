@@ -1,5 +1,6 @@
 import os
 import gym
+import ray
 import tqdm
 import json
 import torch
@@ -19,7 +20,10 @@ from func_timeout import FunctionTimedOut
 
 torch.manual_seed(10)
 parser = argparse.ArgumentParser()
+parser.add_argument("-R", "--run_name", dest="run_name", type=int)
 parser.add_argument("-S", "--setting", dest="setting_path", type=str)
+parser.add_argument("-L", "--log_path", dest="log_path", type=str)
+parser.add_argument("-C", "--checkpoint_path", dest="checkpoint_path", type=str)
 parser.add_argument("-SBZ", "--sub_buffer_size", dest="sub_buffer_size", type=int, default=0)
 parser.add_argument("-R", "--ray", dest="single_ray", type=int, default=0)
 
@@ -31,6 +35,8 @@ else:
 sub_buffer_size = parser.parse_args().sub_buffer_size
 
 # Config path
+log_path = parser.parse_args().log_path
+checkpoint_path = parser.parse_args().checkpoint_path
 settings = parser.parse_args().setting_path
 settings = Dynaconf(envvar_prefix="DYNACONF", settings_files=settings)
 
@@ -41,6 +47,8 @@ mlflow_client = mlflow.tracking.MlflowClient()
 
 # Set hyper parameters
 hyper_parameters = settings.apex.hyper_parameters.to_dict()
+hyper_parameters["logger_config"] = {"type": UnifiedLogger, "logdir": checkpoint_path}
+print("log path: %s \n check_path: %s" % (log_path, checkpoint_path))
 if hyper_parameters["double_q"]:
     run_name = "APEX_DDQN"
 else:
@@ -48,7 +56,7 @@ else:
 
 if sub_buffer_size == 0:
     # Set run object
-    run_name = run_name + "_" + settings.apex.env + "_DPER_" + datetime.datetime.now().strftime("%Y%m%d")
+    run_name = run_name + "_" + settings.apex.env + "_DPER_%d" % parser.parse_args().run_name
     mlflow_run = mlflow.start_run(run_name=run_name,
                                   tags={"mlflow.user": settings.mlflow.user})
     # Log parameters
@@ -58,7 +66,7 @@ if sub_buffer_size == 0:
     algorithm = ApexDQN(config=hyper_parameters, env=settings.apex.env)
 else:
     # Set run object
-    run_name = run_name + "_" + settings.apex.env + "_DPBER_" + datetime.datetime.now().strftime("%Y%m%d")
+    run_name = run_name + "_" + settings.apex.env + "_DPBER_%d" % parser.parse_args().run_name
     mlflow_run = mlflow.start_run(run_name=run_name,
                                   tags={"mlflow.user": settings.mlflow.user})
     env_example = wrap_deepmind(gym.make(settings.apex.env))
@@ -86,20 +94,24 @@ else:
     hyper_parameters["train_batch_size"] = int(hyper_parameters["train_batch_size"] / sub_buffer_size)
     algorithm = ApexDDQNWithDPBER(config=hyper_parameters, env=settings.apex.env)
 
+# Check path available
+check_path(log_path)
+log_path = path.join(log_path, run_name)
+check_path(log_path)
+check_path(checkpoint_path)
+checkpoint_path = path.join(checkpoint_path, run_name)
+check_path(checkpoint_path)
+
 print(algorithm.config.to_dict()["replay_buffer_config"])
 
-# Check path available
-check_path(settings.log.save_file)
-log_path = path.join(settings.log.save_file, run_name)
-check_path(log_path)
-check_path(settings.log.save_checkout)
-checkpoint_path = path.join(settings.log.save_checkout, run_name)
-check_path(checkpoint_path)
 
 with open(os.path.join(checkpoint_path, "%s_config.pyl" % run_name), "wb") as f:
     _ = algorithm.config.to_dict()
     _.pop("multiagent")
     pickle.dump(_, f)
+
+checkpoint_path = path.join(checkpoint_path, "results")
+check_path(checkpoint_path)
 mlflow.log_artifacts(checkpoint_path)
 
 # Run algorithms
@@ -119,7 +131,7 @@ for i in tqdm.tqdm(range(1, 10000)):
             logs_with_timeout(learner_data, step=result["episodes_total"])
             _save = {key: sampler[key] for key in keys_to_extract if key in sampler}
             logs_with_timeout(_save, step=result["episodes_total"])
-        if i % (settings.log.log * 10) == 0:
+        if i % settings.log.log == 0:
             algorithm.save_checkpoint(checkpoint_path)
     except FunctionTimedOut:
         tqdm.tqdm.write("logging failed")

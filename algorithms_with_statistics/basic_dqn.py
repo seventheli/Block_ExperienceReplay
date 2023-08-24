@@ -14,7 +14,7 @@ from ray.rllib.algorithms.dqn.dqn import calculate_rr_weights
 logger = logging.getLogger(__name__)
 
 
-class DQNWithLogging(DQN):
+class DQNWithERLogging(DQN):
     time_usage = {
         "store": 0,
         "sample": 0,

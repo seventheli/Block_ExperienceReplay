@@ -1,20 +1,43 @@
 import os
+import sys
+import gc
 import ray
 import yaml
-import mlflow
 import numpy as np
 from gym import spaces
 from func_timeout import func_set_timeout
 from typing import Dict, Tuple, Union
 
 
+def get_size(obj):
+    marked = {id(obj)}
+    obj_q = [obj]
+    size = 0
+
+    while obj_q:
+        size += sum(sys.getsizeof(i) for i in obj_q)
+        all_refr = ((id(o), o) for o in gc.get_referents(*obj_q))
+        new_refr = {o_id: o for o_id, o in all_refr if o_id not in marked and not isinstance(o, type)}
+        obj_q = new_refr.values()
+        marked.update(new_refr.keys())
+
+    return size
+
+
 def init_ray(ray_setting=None):
     if ray_setting is not None:
         with open(ray_setting, 'r') as file:
             settings = yaml.safe_load(file)
-        ray.init(**settings, _system_config={"maximum_gcs_destroyed_actor_cached_count": 200})
+        ray.init(
+            **settings,
+            include_dashboard=False,
+            _system_config={"maximum_gcs_destroyed_actor_cached_count": 200}
+        )
     else:
-        ray.init("auto")
+        ray.init(
+            "auto",
+            include_dashboard=False
+        )
 
 
 def check_path(path):

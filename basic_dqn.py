@@ -10,7 +10,7 @@ import datetime
 from os import path
 from dynaconf import Dynaconf
 from ray.rllib.algorithms.dqn import DQN
-from algorithms_with_statistics.basic_dqn import DQNWithLogging
+from algorithms_with_statistics.basic_dqn import DQNWithERLogging
 from replay_buffer.ber import BlockReplayBuffer
 from ray.rllib.env.wrappers.atari_wrappers import wrap_deepmind
 from utils import init_ray, check_path, logs_with_timeout, convert_np_arrays
@@ -19,8 +19,10 @@ from func_timeout import FunctionTimedOut
 
 torch.manual_seed(10)
 parser = argparse.ArgumentParser()
+parser.add_argument("-R", "--run_name", dest="run_name", type=int)
 parser.add_argument("-S", "--setting", dest="setting_path", type=str)
-parser.add_argument("-L", "--with_er_logging", dest="er_logging", type=int, default=0)
+parser.add_argument("-L", "--log_path", dest="log_path", type=str)
+parser.add_argument("-C", "--checkpoint_path", dest="checkpoint_path", type=str)
 parser.add_argument("-SBZ", "--sub_buffer_size", dest="sub_buffer_size", type=int, default=0)
 parser.add_argument("-R", "--ray", dest="single_ray", type=int, default=0)
 
@@ -33,6 +35,8 @@ with_er_logging = parser.parse_args().er_logging
 sub_buffer_size = parser.parse_args().sub_buffer_size
 
 # Config path
+log_path = parser.parse_args().log_path
+checkpoint_path = parser.parse_args().checkpoint_path
 settings = parser.parse_args().setting_path
 settings = Dynaconf(envvar_prefix="DYNACONF", settings_files=settings)
 
@@ -43,9 +47,13 @@ mlflow_client = mlflow.tracking.MlflowClient()
 
 # Set hyper parameters
 hyper_parameters = settings.dqn.hyper_parameters.to_dict()
+hyper_parameters["logger_config"] = {"type": UnifiedLogger, "logdir": checkpoint_path}
+print("log path: %s \n check_path: %s" % (log_path, checkpoint_path))
+
+
 if sub_buffer_size == 0:
     # Set run object
-    run_name = "DQN_ER_%s_%s" % (settings.dqn.env, datetime.datetime.now().strftime("%Y%m%d"))
+    run_name = run_name + "_" + settings.dqn.env + "_ER_%d" % parser.parse_args().run_name
     mlflow_run = mlflow.start_run(run_name=run_name,
                                   tags={"mlflow.user": settings.mlflow.user})
     # Log parameters
@@ -54,11 +62,11 @@ if sub_buffer_size == 0:
         {key: hyper_parameters[key] for key in hyper_parameters.keys() if key not in ["replay_buffer_config"]})
 else:
     # Set run object
-    run_name = "DQN_BER_%s_%s" % (settings.dqn.env, datetime.datetime.now().strftime("%Y%m%d"))
+    run_name = run_name + "_" + settings.dqn.env + "_BER_%d" % parser.parse_args().run_name
     mlflow_run = mlflow.start_run(run_name=run_name,
                                   tags={"mlflow.user": settings.mlflow.user})
-    # Log parameters
     env_example = wrap_deepmind(gym.make(settings.dqn.env))
+    # Log parameters
     mlflow.log_params({
         **settings.dqn.hyper_parameters.replay_buffer_config.to_dict(),
         "type": "BlockReplayBuffer",
@@ -78,7 +86,7 @@ else:
     hyper_parameters["replay_buffer_config"] = replay_buffer_config
 
 if with_er_logging:
-    algorithm = DQNWithLogging(config=hyper_parameters, env=settings.dqn.env)
+    algorithm = DQNWithERLogging(config=hyper_parameters, env=settings.dqn.env)
 else:
     algorithm = DQN(config=hyper_parameters, env=settings.dqn.env)
 
@@ -117,7 +125,7 @@ for i in tqdm.tqdm(range(1, 10000)):
             logs_with_timeout(learner_data, step=result["episodes_total"])
             _save = {key: sampler[key] for key in keys_to_extract if key in sampler}
             logs_with_timeout(_save, step=result["episodes_total"])
-        if i % (settings.log.log * 10) == 0:
+        if i % settings.log.log == 0:
             algorithm.save_checkpoint(checkpoint_path)
     except FunctionTimedOut:
         tqdm.tqdm.write("logging failed")
