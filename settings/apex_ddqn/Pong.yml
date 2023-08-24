@@ -23,7 +23,7 @@ apex:
     num_envs_per_worker: 8
     num_gpus: 1
     num_gpus_per_worker: 0
-    num_workers: 16
+    num_workers: 10
     replay_buffer_config:
       capacity: 1000000
       prioritized_replay_alpha: 0.5
