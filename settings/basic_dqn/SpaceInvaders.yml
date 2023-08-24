@@ -31,7 +31,7 @@ dqn:
     num_gpus_per_worker: 0.1
     min_sample_timesteps_per_iteration: 10000
 log:
-  save_file: "/root/autodl-tmp/logging/SpaceInvaders"
-  save_checkout: "/home/autodl-tmp/checkpoints/SpaceInvaders"
+  save_file: "/root/seventheli/logging/SpaceInvaders"
+  save_checkout: "/home/seventheli/checkpoints/SpaceInvaders"
   max_time: 360000
   log: 5

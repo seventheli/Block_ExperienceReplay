@@ -1,21 +1,22 @@
-import os
-import gym
-import tqdm
-import json
-import torch
-import mlflow
-import pickle
 import argparse
 import datetime
-from os import path
-from dynaconf import Dynaconf
-from ray.rllib.algorithms.dqn import DQN
+import gym
+import json
+import mlflow
+import os
+import pickle
+import torch
+import tqdm
 from algorithms_with_statistics.basic_dqn import DQNWithERLogging
-from replay_buffer.ber import BlockReplayBuffer
-from ray.rllib.env.wrappers.atari_wrappers import wrap_deepmind
-from utils import init_ray, check_path, logs_with_timeout, convert_np_arrays
-from mlflow.exceptions import MlflowException
+from dynaconf import Dynaconf
 from func_timeout import FunctionTimedOut
+from mlflow.exceptions import MlflowException
+from os import path
+from ray.rllib.algorithms.dqn import DQN
+from ray.rllib.env.wrappers.atari_wrappers import wrap_deepmind
+from ray.tune.logger import UnifiedLogger
+from replay_buffer.ber import BlockReplayBuffer
+from utils import init_ray, check_path, logs_with_timeout, convert_np_arrays
 
 torch.manual_seed(10)
 parser = argparse.ArgumentParser()
@@ -25,8 +26,9 @@ parser.add_argument("-L", "--log_path", dest="log_path", type=str)
 parser.add_argument("-C", "--checkpoint_path", dest="checkpoint_path", type=str)
 parser.add_argument("-SBZ", "--sub_buffer_size", dest="sub_buffer_size", type=int, default=0)
 parser.add_argument("-R", "--ray", dest="single_ray", type=int, default=0)
+parser.add_argument("-E", "--er_logging", dest="er_logging", type=int, default=0)
 
-if parser.parse_args().single_ray == 0:
+if parser.parse_args().single_ray == 1:
     init_ray()
 else:
     init_ray("./ray_config.yml")
@@ -50,10 +52,9 @@ hyper_parameters = settings.dqn.hyper_parameters.to_dict()
 hyper_parameters["logger_config"] = {"type": UnifiedLogger, "logdir": checkpoint_path}
 print("log path: %s \n check_path: %s" % (log_path, checkpoint_path))
 
-
 if sub_buffer_size == 0:
     # Set run object
-    run_name = run_name + "_" + settings.dqn.env + "_ER_%d" % parser.parse_args().run_name
+    run_name = settings.dqn.env + "_ER_%d" % parser.parse_args().run_name
     mlflow_run = mlflow.start_run(run_name=run_name,
                                   tags={"mlflow.user": settings.mlflow.user})
     # Log parameters
@@ -62,7 +63,7 @@ if sub_buffer_size == 0:
         {key: hyper_parameters[key] for key in hyper_parameters.keys() if key not in ["replay_buffer_config"]})
 else:
     # Set run object
-    run_name = run_name + "_" + settings.dqn.env + "_BER_%d" % parser.parse_args().run_name
+    run_name = settings.dqn.env + "_BER_%d" % parser.parse_args().run_name
     mlflow_run = mlflow.start_run(run_name=run_name,
                                   tags={"mlflow.user": settings.mlflow.user})
     env_example = wrap_deepmind(gym.make(settings.dqn.env))
@@ -93,17 +94,20 @@ else:
 print(algorithm.config.to_dict()["replay_buffer_config"])
 
 # Check path available
-check_path(settings.log.save_file)
-log_path = path.join(settings.log.save_file, run_name)
 check_path(log_path)
-check_path(settings.log.save_checkout)
-checkpoint_path = path.join(settings.log.save_checkout, run_name)
+log_path = path.join(log_path, run_name)
+check_path(log_path)
+check_path(checkpoint_path)
+checkpoint_path = path.join(checkpoint_path, run_name)
 check_path(checkpoint_path)
 
 with open(os.path.join(checkpoint_path, "%s_config.pyl" % run_name), "wb") as f:
     _ = algorithm.config.to_dict()
     _.pop("multiagent")
     pickle.dump(_, f)
+
+checkpoint_path = path.join(checkpoint_path, "results")
+check_path(checkpoint_path)
 mlflow.log_artifacts(checkpoint_path)
 
 # Run algorithms

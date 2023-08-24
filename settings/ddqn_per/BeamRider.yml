@@ -33,7 +33,7 @@ dqn:
     num_gpus_per_worker: 0.1
     min_sample_timesteps_per_iteration: 10000
 log:
-  save_file: "/root/autodl-tmp/logging/BeamRider"
-  save_checkout: "/home/autodl-tmp/checkpoints/BeamRider"
+  save_file: "/home/seventheli/logging/BeamRider"
+  save_checkout: "/home/seventheli/checkpoints/BeamRider"
   max_time: 360000
   log: 5

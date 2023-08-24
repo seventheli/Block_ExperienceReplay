@@ -33,7 +33,7 @@ apex:
     target_network_update_freq: 50000
     train_batch_size: 512
 log:
-  save_file: "/root/autodl-tmp/logging/BeamRider"
-  save_checkout: "/home/autodl-tmp/checkpoints/BeamRider"
+  save_file: "/home/seventheli/logging/BeamRider"
+  save_checkout: "/home/seventheli/checkpoints/BeamRider"
   max_time: 360000
   log: 5

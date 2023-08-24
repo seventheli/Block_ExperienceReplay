@@ -1,22 +1,23 @@
-import os
-import gym
-import ray
-import tqdm
-import json
-import torch
-import mlflow
-import pickle
 import argparse
 import datetime
-from os import path
-from dynaconf import Dynaconf
+import gym
+import json
+import mlflow
+import os
+import pickle
+import ray
+import torch
+import tqdm
 from algorithms.apex_ddqn_pber import ApexDDQNWithDPBER
-from replay_buffer.mpber import MultiAgentPrioritizedBlockReplayBuffer
-from ray.rllib.env.wrappers.atari_wrappers import wrap_deepmind
-from utils import init_ray, check_path, logs_with_timeout, convert_np_arrays
-from ray.rllib.algorithms.apex_dqn import ApexDQN
-from mlflow.exceptions import MlflowException
+from dynaconf import Dynaconf
 from func_timeout import FunctionTimedOut
+from mlflow.exceptions import MlflowException
+from os import path
+from ray.rllib.algorithms.apex_dqn import ApexDQN
+from ray.rllib.env.wrappers.atari_wrappers import wrap_deepmind
+from ray.tune.logger import UnifiedLogger
+from replay_buffer.mpber import MultiAgentPrioritizedBlockReplayBuffer
+from utils import init_ray, check_path, logs_with_timeout, convert_np_arrays
 
 torch.manual_seed(10)
 parser = argparse.ArgumentParser()
@@ -27,7 +28,7 @@ parser.add_argument("-C", "--checkpoint_path", dest="checkpoint_path", type=str)
 parser.add_argument("-SBZ", "--sub_buffer_size", dest="sub_buffer_size", type=int, default=0)
 parser.add_argument("-R", "--ray", dest="single_ray", type=int, default=0)
 
-if parser.parse_args().single_ray == 0:
+if parser.parse_args().single_ray == 1:
     init_ray()
 else:
     init_ray("./ray_config.yml")
@@ -56,7 +57,7 @@ else:
 
 if sub_buffer_size == 0:
     # Set run object
-    run_name = run_name + "_" + settings.apex.env + "_DPER_%d" % parser.parse_args().run_name
+    run_name = settings.apex.env + "_DPER_%d" % parser.parse_args().run_name
     mlflow_run = mlflow.start_run(run_name=run_name,
                                   tags={"mlflow.user": settings.mlflow.user})
     # Log parameters
@@ -66,7 +67,7 @@ if sub_buffer_size == 0:
     algorithm = ApexDQN(config=hyper_parameters, env=settings.apex.env)
 else:
     # Set run object
-    run_name = run_name + "_" + settings.apex.env + "_DPBER_%d" % parser.parse_args().run_name
+    run_name = settings.apex.env + "_DPBER_%d" % parser.parse_args().run_name
     mlflow_run = mlflow.start_run(run_name=run_name,
                                   tags={"mlflow.user": settings.mlflow.user})
     env_example = wrap_deepmind(gym.make(settings.apex.env))
@@ -103,7 +104,6 @@ checkpoint_path = path.join(checkpoint_path, run_name)
 check_path(checkpoint_path)
 
 print(algorithm.config.to_dict()["replay_buffer_config"])
-
 
 with open(os.path.join(checkpoint_path, "%s_config.pyl" % run_name), "wb") as f:
     _ = algorithm.config.to_dict()
