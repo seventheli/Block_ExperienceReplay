@@ -115,24 +115,28 @@ check_path(checkpoint_path)
 mlflow.log_artifacts(checkpoint_path)
 
 # Run algorithms
-keys_to_extract = {"episode_reward_max", "episode_reward_min", "episode_reward_mean"}
+keys_to_extract_sam = {"episode_reward_max", "episode_reward_min", "episode_reward_mean"}
+keys_to_extract_sta = {"num_agent_steps_sampled", "num_agent_steps_trained", "episode_reward_mean"}
+keys_to_extract_buf = {"add_batch_time_ms", "replay_time_ms", "update_priorities_time_ms"}
 for i in tqdm.tqdm(range(1, 10000)):
     try:
         result = algorithm.train()
         time_used = result["time_total_s"]
-        # statistics
-        sampler = result.get("sampler_results", None)
     except:
         continue
     try:
-        if i >= 10 and i % settings.log.log == 0:
-            learner_data = result["info"].copy()
-            learner_data.pop("learner")
-            logs_with_timeout(learner_data, step=result["episodes_total"])
-            _save = {key: sampler[key] for key in keys_to_extract if key in sampler}
-            logs_with_timeout(_save, step=result["episodes_total"])
-        if i % settings.log.log == 0:
+        if i >= settings.log.log and i % settings.log.log == 0:
+            sampler = result.get("sampler_results", {}).copy()
+            info = result.get("info", {}).copy()
+            sam = {key: sampler[key] for key in keys_to_extract_sam if key in sampler}
+            sta = {key: info[key] for key in keys_to_extract_sta if key in info}
+            buf = flatten_dict(info.get("replay_shard_0", {}))
+            lea = info.get("learner", {}).get("time_usage", {})
+            mlflow.log_metrics({**sam, **sta, **buf, **lea}, step=result["episodes_total"])
             algorithm.save_checkpoint(checkpoint_path)
+        if i % (settings.log.log * 100) == 0:
+            mlflow.log_artifacts(log_path)
+            mlflow.log_artifacts(checkpoint_path)
     except FunctionTimedOut:
         tqdm.tqdm.write("logging failed")
     except MlflowException:
@@ -143,5 +147,4 @@ for i in tqdm.tqdm(range(1, 10000)):
     if time_used >= settings.log.max_time:
         break
 
-mlflow.log_artifacts(log_path)
-mlflow.log_artifacts(checkpoint_path)
+

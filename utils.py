@@ -61,6 +61,17 @@ def logs_with_timeout(data, step):
         pass
 
 
+def flatten_dict(d):
+    flat_dict = {}
+    for key, value in d.items():
+        if isinstance(value, dict):
+            for subkey, subvalue in value.items():
+                flat_dict[subkey] = subvalue
+        else:
+            flat_dict[key] = value
+    return flat_dict
+
+
 def convert_np_arrays(obj):
     if isinstance(obj, np.ndarray):
         return obj.tolist()
