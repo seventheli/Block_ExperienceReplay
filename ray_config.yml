@@ -1,4 +1,10 @@
 num_gpus:
   1
 num_cpus:
-  10
+  16
+object_store_memory:
+  60000000000
+dashboard_host:
+  0.0.0.0
+_memory:
+  200000000000
