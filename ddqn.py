@@ -1,5 +1,4 @@
 import argparse
-import datetime
 import gym
 import json
 import mlflow
@@ -18,7 +17,7 @@ from ray.rllib.algorithms.dqn import DQN
 from ray.rllib.env.wrappers.atari_wrappers import wrap_deepmind
 from ray.tune.logger import UnifiedLogger
 from replay_buffer.mpber import MultiAgentPrioritizedBlockReplayBuffer
-from utils import init_ray, check_path, logs_with_timeout, convert_np_arrays
+from utils import init_ray, check_path, flatten_dict, convert_np_arrays
 
 torch.manual_seed(10)
 parser = argparse.ArgumentParser()
