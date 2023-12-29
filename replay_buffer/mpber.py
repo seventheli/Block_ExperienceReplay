@@ -1,6 +1,5 @@
 import numpy as np
-import logging
-from gym.spaces import Space
+from gymnasium.spaces import Space
 from typing import Dict
 from ray.rllib.utils.annotations import override, DeveloperAPI
 from ray.rllib.utils.replay_buffers.utils import SampleBatchType
@@ -12,6 +11,9 @@ from replay_buffer.replay_node import BaseBuffer
 from ray.rllib.utils.replay_buffers import StorageUnit
 from ray.util.debug import log_once
 
+import logging
+
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
@@ -46,7 +48,6 @@ class PrioritizedBlockReplayBuffer(PrioritizedReplayBuffer):
         if not batch.count > 0:
             return
         buffer = self.base_buffer
-
         self.base_buffer.add(batch)
         if buffer.full:
             data = buffer.sample()
@@ -114,7 +115,7 @@ class MultiAgentPrioritizedBlockReplayBuffer(MultiAgentPrioritizedReplayBuffer):
             replay_zero_init_states: Whether the initial states in the
                 buffer (if replay_sequence_length > 0) are alwayas 0.0 or
                 should be updated with the previous train_batch state outputs.
-            underlying_buffer_config: B config that contains all necessary
+            underlying_buffer_config: A config that contains all necessary
                 constructor arguments and arguments for methods to call on
                 the underlying buffers. This replaces the standard behaviour
                 of the underlying PrioritizedReplayBuffer. The config
@@ -198,13 +199,16 @@ class MultiAgentPrioritizedBlockReplayBuffer(MultiAgentPrioritizedReplayBuffer):
         batch = batch.copy()
         # Handle everything as if multi-agent.
         batch = batch.as_multi_agent()
+
         with self.add_batch_timer:
+
             pids_and_batches = self._maybe_split_into_policy_batches(batch)
             for policy_id, sample_batch in pids_and_batches.items():
                 if len(sample_batch) == 1:
                     self._add_to_underlying_buffer(policy_id, sample_batch)
                 else:
-                    for s_batch in sample_batch.timeslices(self.rollout_fragment_length):
+                    _ = sample_batch.timeslices(size=self.rollout_fragment_length)
+                    for s_batch in _:
                         self._add_to_underlying_buffer(policy_id, s_batch)
 
         self._num_added += batch.count
@@ -228,3 +232,11 @@ class MultiAgentPrioritizedBlockReplayBuffer(MultiAgentPrioritizedReplayBuffer):
                 self.replay_buffers[policy_id].update_priorities(
                     batch_indexes, new_priorities
                 )
+
+    def _maybe_split_into_policy_batches(self, batch: SampleBatchType):
+        """Returns a dict of policy IDs and batches, depending on our replay mode.
+
+        This method helps with splitting up MultiAgentBatches only if the
+        self.replay_mode requires it.
+        """
+        return batch.policy_batches

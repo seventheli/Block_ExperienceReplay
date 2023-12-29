@@ -1,14 +1,16 @@
 from abc import ABC
 from utils import get_action_dim, get_obs_shape
 from ray.rllib.policy.policy import SampleBatch
-from gym import spaces
+from gymnasium import spaces
 import numpy as np
+import logging
 
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 class BaseBuffer(ABC):
     """
     Base class that represent a buffer (rollout or replay)
-
     :param buffer_size: Max number of element in the buffer
     :param obs_space: obs space
     :param action_space: Action space to which the values will be converted
@@ -32,7 +34,8 @@ class BaseBuffer(ABC):
         self.new_obs = np.zeros(np.concatenate([[self.buffer_size], self.obs_space]), dtype=obs_space.dtype)
         self.actions = np.zeros(self.buffer_size, dtype=np.int32)
         self.rewards = np.zeros(self.buffer_size, dtype=np.float32)
-        self.dones = np.zeros(self.buffer_size, dtype=np.int32)
+        self.terminateds = np.zeros(self.buffer_size, dtype=np.int32)
+        self.truncateds = np.zeros(self.buffer_size, dtype=np.int32)
         self.weights = np.zeros(self.buffer_size, dtype=np.float32)
         self.t = np.zeros(self.buffer_size, dtype=np.int32)
 
@@ -53,7 +56,8 @@ class BaseBuffer(ABC):
         self.new_obs[self.pos:self.pos + shape] = batch.get("new_obs")
         self.actions[self.pos:self.pos + shape] = batch.get("actions")
         self.rewards[self.pos:self.pos + shape] = batch.get("rewards")
-        self.dones[self.pos:self.pos + shape] = batch.get("dones")
+        self.terminateds[self.pos:self.pos + shape] = batch.get("terminateds")
+        self.truncateds[self.pos:self.pos + shape] = batch.get("truncateds")
         self.weights[self.pos:self.pos + shape] = batch.get("weights")
         self.pos += shape
         if self.pos == self.buffer_size:
@@ -88,7 +92,8 @@ class BaseBuffer(ABC):
                 "new_obs": self.new_obs[batch_inds, :],
                 "actions": self.actions[batch_inds],
                 "rewards": self.rewards[batch_inds],
-                "dones": self.dones[batch_inds],
+                "terminateds": self.terminateds[batch_inds],
+                "truncateds": self.truncateds[batch_inds],
                 "weights": self.weights[batch_inds]
             }
         )
