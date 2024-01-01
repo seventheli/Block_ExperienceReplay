@@ -1,6 +1,7 @@
 import os
 import ray
 import json
+import torch
 import pickle
 import tqdm
 import argparse
@@ -36,12 +37,10 @@ checkpoint_path = parser.parse_args().checkpoint_path
 setting = parser.parse_args().setting_path
 setting = Dynaconf(envvar_prefix="DYNACONF", settings_files=setting)
 
-# Set hyper parameters
 hyper_parameters = setting.hyper_parameters.to_dict()
 hyper_parameters["logger_config"] = {"type": JsonLogger, "logdir": checkpoint_path}
 hyper_parameters["env_config"] = {
-    "id": "MiniGrid-LavaCrossingS9N3-v0",
-    "tile_size": 14,
+    "id": str(setting.env)
 
 }
 print("log path: %s, check_path: %s" % (log_path, checkpoint_path))
@@ -59,7 +58,7 @@ obs, _ = env.reset()
 step = env.step(1)
 print(env.action_space, env.observation_space)
 
-register_env(hyper_parameters["env_config"]["id"], env_creator)
+register_env("example", env_creator)
 
 ModelCatalog.register_custom_model("CustomCNN", CustomCNN)
 
@@ -85,9 +84,11 @@ replay_buffer_config = {
 }
 hyper_parameters["replay_buffer_config"] = replay_buffer_config
 hyper_parameters["train_batch_size"] = int(hyper_parameters["train_batch_size"] / sub_buffer_size)
-trainer = ApexDDQNWithDPBER(config=hyper_parameters, env=hyper_parameters["env_config"]["id"])
 
-run_name = hyper_parameters["env_config"]["id"] + run_name
+# Set trainer
+trainer = ApexDDQNWithDPBER(config=hyper_parameters, env="example")
+
+run_name = hyper_parameters["env_config"]["id"] + " dpber " + run_name
 
 # Check path available
 check_path(log_path)
@@ -106,8 +107,7 @@ checkpoint_path = path.join(checkpoint_path, "results")
 check_path(checkpoint_path)
 
 # Run algorithms
-keys_to_extract = {"episode_reward_max", "episode_reward_min", "episode_reward_mean"}
-for i in tqdm.tqdm(range(1, 10000)):
+for i in tqdm.tqdm(range(1, setting.max_run)):
     try:
         result = trainer.train()
         time_used = result["time_total_s"]

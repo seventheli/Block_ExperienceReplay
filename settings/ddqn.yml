@@ -27,5 +27,6 @@ dqn:
     min_sample_timesteps_per_iteration: 10000
   run: DDQN
 log:
+  max_run: 100
   log: 100
   max_time: 360000

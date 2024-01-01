@@ -17,8 +17,8 @@ class CustomCNN(TorchModelV2, nn.Module):
         nn.Module.__init__(self)
 
         self.conv_layers = nn.Sequential(
-            SlimConv2d(obs_space.shape[-1], 32, kernel=3, stride=1, padding=2),
-            SlimConv2d(32, 64, kernel=3, stride=1, padding=1),
+            SlimConv2d(obs_space.shape[-1], 32, kernel=8, stride=4, padding=2),
+            SlimConv2d(32, 64, kernel=4, stride=3, padding=1),
             SlimConv2d(64, 128, kernel=3, stride=2, padding=1),
         )
 
