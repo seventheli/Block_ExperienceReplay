@@ -1,7 +1,7 @@
 #!/bin/bash
 module load python/anaconda3
 source $condaDotFile
-source activate hpc
+source activate gymnasium
 
 nvidia-smi
 
