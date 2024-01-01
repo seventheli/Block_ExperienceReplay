@@ -1,4 +1,4 @@
-name: hpc_gymnasium
+name: gymnasium
 channels:
   - defaults
   - conda-forge
