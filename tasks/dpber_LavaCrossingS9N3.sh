@@ -1,8 +1,8 @@
 #!/bin/bash
 # Activate conda environment and run nvidia-smi
 module load python/anaconda3
-sleep 120
-source activate hpc_gymnasium
+source $condaDotFile
+source conda activate hpc_gymnasium
 sleep 120
 nvidia-smi
 
