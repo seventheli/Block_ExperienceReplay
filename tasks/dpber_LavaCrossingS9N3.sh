@@ -3,6 +3,7 @@
 module load python/anaconda3
 sleep 120
 source activate hpc_gymnasium
+sleep 120
 nvidia-smi
 
 which python
