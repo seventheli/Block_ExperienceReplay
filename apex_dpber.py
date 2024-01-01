@@ -29,8 +29,10 @@ parser.add_argument("-R", "--run_name", dest="run_name", type=int)
 parser.add_argument("-S", "--setting", dest="setting_path", type=str)
 parser.add_argument("-L", "--log_path", dest="log_path", type=str)
 parser.add_argument("-C", "--checkpoint_path", dest="checkpoint_path", type=str)
+parser.add_argument("-E", "--env", dest="env_path", type=str)
 
 # Config path
+env = "MiniGrid-" + parser.parse_args().env
 run_name = parser.parse_args().run_name
 log_path = parser.parse_args().log_path
 checkpoint_path = parser.parse_args().checkpoint_path
@@ -40,7 +42,7 @@ setting = Dynaconf(envvar_prefix="DYNACONF", settings_files=setting)
 hyper_parameters = setting.hyper_parameters.to_dict()
 hyper_parameters["logger_config"] = {"type": JsonLogger, "logdir": checkpoint_path}
 hyper_parameters["env_config"] = {
-    "id": str(setting.env)
+    "id": env
 
 }
 print("log path: %s, check_path: %s" % (log_path, checkpoint_path))
