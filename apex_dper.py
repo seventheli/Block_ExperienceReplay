@@ -113,7 +113,7 @@ checkpoint_path = path.join(checkpoint_path, "results")
 check_path(checkpoint_path)
 
 # Run algorithms
-for i in tqdm.tqdm(range(1, 100)):
+for i in tqdm.tqdm(range(1, setting.log.max_run)):
     try:
         result = trainer.train()
         time_used = result["time_total_s"]
