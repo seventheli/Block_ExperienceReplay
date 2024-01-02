@@ -8,9 +8,9 @@ nvidia-smi
 which python
 
 # Define paths
-_path="/home/seventheli//Block_ExperienceReplay/"
-_log="/home/seventheli//logging/minigrid/DistShift2/"
-_checkpoint="/home/seventheli//checkpoints/minigrid/DistShift2/"
+_path="/jmain02/home/J2AD006/jxb06/cxz46-jxb06/Block_ExperienceReplay/"
+_log="/jmain02/home/J2AD006/jxb06/cxz46-jxb06/logging/minigrid/DistShift2/"
+_checkpoint="/jmain02/home/J2AD006/jxb06/cxz46-jxb06/checkpoints/minigrid/DistShift2/"
 
 # Change directory
 cd $_path || exit
