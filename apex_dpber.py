@@ -32,7 +32,7 @@ parser.add_argument("-C", "--checkpoint_path", dest="checkpoint_path", type=str)
 parser.add_argument("-E", "--env", dest="env_path", type=str)
 
 # Config path
-env = "MiniGrid-" + parser.parse_args().env
+env = "MiniGrid-" + parser.parse_args().env_path
 run_name = parser.parse_args().run_name
 log_path = parser.parse_args().log_path
 checkpoint_path = parser.parse_args().checkpoint_path
