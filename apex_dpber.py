@@ -51,7 +51,7 @@ print("log path: %s, check_path: %s" % (log_path, checkpoint_path))
 # Build env
 def env_creator(env_config):
     _env = gym.make(env_config["id"], render_mode="rgb_array")
-    _env = RGBImgPartialObsWrapper(_env, tile_size=env_config["tile_size"])
+    _env = RGBImgPartialObsWrapper(_env)
     return ImgObsWrapper(_env)
 
 
