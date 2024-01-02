@@ -16,7 +16,7 @@ _checkpoint="/jmain02/home/J2AD006/jxb06/cxz46-jxb06/checkpoints/minigrid/LavaCr
 cd $_path || exit
 
 # Run Python script
-python $_path/apex_dpber.py \
+python $_path/apex_dper.py \
     -R $SLURM_JOB_ID \
     -S $_path/settings/apex.yml \
     -L $_log \

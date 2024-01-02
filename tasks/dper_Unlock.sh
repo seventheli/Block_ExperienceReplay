@@ -9,16 +9,16 @@ which python
 
 # Define paths
 _path="/jmain02/home/J2AD006/jxb06/cxz46-jxb06/Block_ExperienceReplay/"
-_log="/jmain02/home/J2AD006/jxb06/cxz46-jxb06/logging/minigrid/LavaCrossingS9N3/"
-_checkpoint="/jmain02/home/J2AD006/jxb06/cxz46-jxb06/checkpoints/minigrid/LavaCrossingS9N3/"
+_log="/jmain02/home/J2AD006/jxb06/cxz46-jxb06/logging/minigrid/Unlock/"
+_checkpoint="/jmain02/home/J2AD006/jxb06/cxz46-jxb06/checkpoints/minigrid/Unlock/"
 
 # Change directory
 cd $_path || exit
 
 # Run Python script
-python $_path/apex_dpber.py \
+python $_path/apex_dper.py \
     -R $SLURM_JOB_ID \
     -S $_path/settings/apex.yml \
     -L $_log \
     -C $_checkpoint \
-    -E LavaCrossingS9N3
+    -E Unlock
