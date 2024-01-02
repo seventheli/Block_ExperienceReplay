@@ -31,6 +31,6 @@ hyper_parameters:
   min_sample_timesteps_per_iteration: 25000
 run: APEX
 log:
-  max_run: 100
-  log: 100
+  max_run: 5000
+  log: 10
   max_time: 360000
