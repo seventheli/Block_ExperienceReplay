@@ -19,7 +19,7 @@ from minigrid.wrappers import ImgObsWrapper
 from utils import check_path, convert_np_arrays
 
 ray.init(
-    num_cpus=24, num_gpus=1,
+    num_cpus=20, num_gpus=1,
     include_dashboard=False,
     _system_config={"maximum_gcs_destroyed_actor_cached_count": 200},
 )
