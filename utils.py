@@ -120,7 +120,7 @@ def create_input(data):
 
 def check_path(path):
     if not os.path.exists(path):
-        os.makedirs(path)
+        os.makedirs(path, exist_ok=True)
 
 
 def convert_np_arrays(obj):
