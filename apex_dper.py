@@ -88,13 +88,6 @@ replay_buffer_config = {
 hyper_parameters["replay_buffer_config"] = replay_buffer_config
 hyper_parameters["train_batch_size"] = int(hyper_parameters["train_batch_size"] / sub_buffer_size)
 
-# Set trainer
-config = ApexDQNConfig().environment("example")
-config.update_from_dict(hyper_parameters)
-trainer = config.build()
-
-run_name = hyper_parameters["env_config"]["id"] + " dper " + run_name
-
 # Check path available
 check_path(log_path)
 log_path = path.join(log_path, run_name)
@@ -102,6 +95,14 @@ check_path(log_path)
 check_path(checkpoint_path)
 checkpoint_path = path.join(checkpoint_path, run_name)
 check_path(checkpoint_path)
+print(checkpoint_path, print(log_path))
+
+# Set trainer
+config = ApexDQNConfig().environment("example")
+config.update_from_dict(hyper_parameters)
+trainer = config.build()
+
+run_name = hyper_parameters["env_config"]["id"] + " dper " + run_name
 
 print(trainer.config.to_dict()["replay_buffer_config"])
 

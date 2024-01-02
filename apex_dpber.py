@@ -71,6 +71,15 @@ hyper_parameters["model"] = {
     "custom_model_config": {},
 }
 
+# Check path available
+check_path(log_path)
+log_path = path.join(log_path, run_name)
+check_path(log_path)
+check_path(checkpoint_path)
+checkpoint_path = path.join(checkpoint_path, run_name)
+check_path(checkpoint_path)
+print(checkpoint_path, print(log_path))
+
 # Set BER
 sub_buffer_size = hyper_parameters["rollout_fragment_length"]
 replay_buffer_config = {
@@ -92,14 +101,6 @@ trainer = ApexDDQNWithDPBER(config=hyper_parameters, env="example")
 
 run_name = hyper_parameters["env_config"]["id"] + " dpber " + run_name
 
-# Check path available
-check_path(log_path)
-log_path = path.join(log_path, run_name)
-check_path(log_path)
-check_path(checkpoint_path)
-checkpoint_path = path.join(checkpoint_path, run_name)
-check_path(checkpoint_path)
-print(checkpoint_path, print(log_path))
 print(trainer.config.to_dict()["replay_buffer_config"])
 
 with open(os.path.join(checkpoint_path, "%s_config.pyl" % run_name), "wb") as f:
