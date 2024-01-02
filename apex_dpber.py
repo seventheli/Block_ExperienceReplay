@@ -99,7 +99,7 @@ check_path(log_path)
 check_path(checkpoint_path)
 checkpoint_path = path.join(checkpoint_path, run_name)
 check_path(checkpoint_path)
-
+print(checkpoint_path, print(log_path))
 print(trainer.config.to_dict()["replay_buffer_config"])
 
 with open(os.path.join(checkpoint_path, "%s_config.pyl" % run_name), "wb") as f:
