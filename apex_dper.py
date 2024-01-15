@@ -71,23 +71,6 @@ hyper_parameters["model"] = {
     "custom_model_config": {},
 }
 
-# Set BER
-sub_buffer_size = hyper_parameters["rollout_fragment_length"]
-replay_buffer_config = {
-    **hyper_parameters["replay_buffer_config"],
-    "type": MultiAgentPrioritizedBlockReplayBuffer,
-    "capacity": int(hyper_parameters["replay_buffer_config"]["capacity"]),
-    "obs_space": env.observation_space,
-    "action_space": env.action_space,
-    "sub_buffer_size": sub_buffer_size,
-    "worker_side_prioritization": False,
-    "replay_buffer_shards_colocated_with_driver": True,
-    "rollout_fragment_length": hyper_parameters["rollout_fragment_length"]
-}
-
-hyper_parameters["replay_buffer_config"] = replay_buffer_config
-hyper_parameters["train_batch_size"] = int(hyper_parameters["train_batch_size"] / sub_buffer_size)
-
 # Check path available
 check_path(log_path)
 log_path = path.join(log_path, run_name)
