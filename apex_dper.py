@@ -1,26 +1,24 @@
 import os
 import ray
+import argparse
 import json
-import torch
 import pickle
 import tqdm
-import argparse
-import gymnasium as gym
 from os import path
-from model import CustomCNN
+from utils import check_path, convert_np_arrays
 from dynaconf import Dynaconf
 from ray.rllib.models import ModelCatalog
+from model import CNN
 from ray.tune.registry import register_env
 from ray.tune.logger import JsonLogger
 from ray.rllib.algorithms.apex_dqn import ApexDQNConfig
-from minigrid.wrappers import RGBImgPartialObsWrapper
-from replay_buffer.mpber import MultiAgentPrioritizedBlockReplayBuffer
-from minigrid.wrappers import ImgObsWrapper
-from utils import check_path, convert_np_arrays
 
+from utils import minigrid_env_creator as env_creator
+
+# Init Ray
 ray.init(
     num_cpus=20, num_gpus=1,
-    include_dashboard=False,
+    include_dashboard=True,
     _system_config={"maximum_gcs_destroyed_actor_cached_count": 200},
 )
 
@@ -32,80 +30,76 @@ parser.add_argument("-C", "--checkpoint_path", dest="checkpoint_path", type=str)
 parser.add_argument("-E", "--env", dest="env_path", type=str)
 
 # Config path
-env = "MiniGrid-" + parser.parse_args().env_path
+env_name = parser.parse_args().env_path
 run_name = str(parser.parse_args().run_name)
 log_path = parser.parse_args().log_path
 checkpoint_path = parser.parse_args().checkpoint_path
+run_name = env_name + " dper " + run_name
+
+# Check path available
+check_path(log_path)
+log_path = str(path.join(log_path, run_name))
+check_path(log_path)
+check_path(checkpoint_path)
+checkpoint_path = path.join(checkpoint_path, run_name)
+check_path(checkpoint_path)
+
 setting = parser.parse_args().setting_path
 setting = Dynaconf(envvar_prefix="DYNACONF", settings_files=setting)
 
 hyper_parameters = setting.hyper_parameters.to_dict()
 hyper_parameters["logger_config"] = {"type": JsonLogger, "logdir": checkpoint_path}
 hyper_parameters["env_config"] = {
-    "id": env
-
+    "id": env_name,
+    "size": 12,
+    "roads": (1, 4),
+    "max_steps": 300,
+    "battery": 100,
+    "img_size": 80,
+    "tile_size": 8,
+    "num_stack": 1,
+    "render_mode": "rgb_array",
+    "agent_pov": False
 }
-print("log path: %s, check_path: %s" % (log_path, checkpoint_path))
 
+register_env(env_name, env_creator)
 
-# Build env
-def env_creator(env_config):
-    _env = gym.make(env_config["id"], render_mode="rgb_array")
-    _env = RGBImgPartialObsWrapper(_env)
-    return ImgObsWrapper(_env)
-
-
-env = env_creator(hyper_parameters["env_config"])
-obs, _ = env.reset()
-step = env.step(1)
-print(env.action_space, env.observation_space)
+env_example = env_creator(hyper_parameters["env_config"])
+obs, _ = env_example.reset()
+step = env_example.step(1)
+print(env_example.action_space, env_example.observation_space)
 
 register_env("example", env_creator)
 
-ModelCatalog.register_custom_model("CustomCNN", CustomCNN)
+ModelCatalog.register_custom_model("CNN", CNN)
 
 hyper_parameters["model"] = {
-    "custom_model": "CustomCNN",
+    "custom_model": "CNN",
     "no_final_linear": True,
     "fcnet_hiddens": hyper_parameters["hiddens"],
     "custom_model_config": {},
 }
-
-# Check path available
-check_path(log_path)
-log_path = path.join(log_path, run_name)
-check_path(log_path)
-check_path(checkpoint_path)
-checkpoint_path = path.join(checkpoint_path, run_name)
-check_path(checkpoint_path)
-print(checkpoint_path, print(log_path))
 
 # Set trainer
 config = ApexDQNConfig().environment("example")
 config.update_from_dict(hyper_parameters)
 trainer = config.build()
 
-run_name = hyper_parameters["env_config"]["id"] + " dper " + run_name
-
-print(trainer.config.to_dict()["replay_buffer_config"])
-
+checkpoint_path = str(checkpoint_path)
 with open(os.path.join(checkpoint_path, "%s_config.pyl" % run_name), "wb") as f:
     pickle.dump(trainer.config.to_dict(), f)
 
-checkpoint_path = path.join(checkpoint_path, "results")
+checkpoint_path = str(path.join(checkpoint_path, "results"))
 check_path(checkpoint_path)
 
 # Run algorithms
 for i in tqdm.tqdm(range(1, setting.log.max_run)):
-    try:
-        result = trainer.train()
-        time_used = result["time_total_s"]
-        if i % setting.log.log == 0:
-            trainer.save_checkpoint(checkpoint_path)
-        with open(path.join(log_path, str(i) + ".json"), "w") as f:
-            result["config"] = None
-            json.dump(convert_np_arrays(result), f)
-        if time_used >= setting.log.max_time:
-            break
-    except:
-        pass
+    result = trainer.train()
+    time_used = result["time_total_s"]
+    if i % setting.log.log == 0:
+        trainer.save_checkpoint(checkpoint_path)
+    with open(path.join(log_path, str(i) + ".json"), "w") as f:
+        result["config"] = None
+        json.dump(convert_np_arrays(result), f)
+    if time_used >= setting.log.max_time:
+        break

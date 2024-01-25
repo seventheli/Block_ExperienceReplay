@@ -58,7 +58,7 @@ class PrioritizedBlockReplayBuffer(PrioritizedReplayBuffer):
 
 @DeveloperAPI
 class MultiAgentPrioritizedBlockReplayBuffer(MultiAgentPrioritizedReplayBuffer):
-    """A prioritized replay buffer shard for multiagent setups.
+    """A prioritized replay buffer shard for multi-agent setups.
 
     This buffer is meant to be run in parallel to distribute experiences
     across `num_shards` shards. Unlike simpler buffers, it holds a set of
@@ -113,7 +113,7 @@ class MultiAgentPrioritizedBlockReplayBuffer(MultiAgentPrioritizedReplayBuffer):
                 better internal state (=state after the burn-in), instead of
                 starting from 0.0 each RNN rollout.
             replay_zero_init_states: Whether the initial states in the
-                buffer (if replay_sequence_length > 0) are alwayas 0.0 or
+                buffer (if replay_sequence_length > 0) are always 0.0 or
                 should be updated with the previous train_batch state outputs.
             underlying_buffer_config: A config that contains all necessary
                 constructor arguments and arguments for methods to call on

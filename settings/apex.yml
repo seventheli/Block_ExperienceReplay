@@ -12,23 +12,20 @@ hyper_parameters:
   n_step: 3
   num_atoms: 1
   replay_buffer_config:
-    capacity: 2000000
+    capacity: 1000000
     prioritized_replay_alpha: 0.5
     prioritized_replay_beta: 1
     type: MultiAgentPrioritizedReplayBuffer
-  resources:
-    num_gpus: 1
-    num_cpus_per_worker: 1
-    num_gpus_per_worker: 0.1
-    num_envs_per_worker: 64
-    num_cpus_per_learner_worker: 1
-    num_gpus_per_learner_worker: 1
-  num_workers: 16
+  num_gpus: 1
+  num_cpus_per_worker: 3
+  num_gpus_per_worker: 0.01
+  num_envs_per_worker: 2
+  num_workers: 4
   num_steps_sampled_before_learning_starts: 20000
-  rollout_fragment_length: 32
+  rollout_fragment_length: 16
   target_network_update_freq: 50000
-  train_batch_size: 1024
-  min_sample_timesteps_per_iteration: 25000
+  train_batch_size: 512
+  min_sample_timesteps_per_iteration: 10000
 run: APEX
 log:
   max_run: 5000

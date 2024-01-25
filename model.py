@@ -1,44 +1,37 @@
 import torch
-
 import torch.nn as nn
 from gymnasium.spaces.discrete import Discrete
 from ray.rllib.models.torch.torch_modelv2 import TorchModelV2
-from ray.rllib.models.torch.misc import SlimFC, SlimConv2d
+from ray.rllib.models.torch.misc import SlimFC
 import logging
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-class CustomCNN(TorchModelV2, nn.Module):
-
+class CNN(TorchModelV2, nn.Module):
     def __init__(self, obs_space, action_space: Discrete, num_outputs, model_config, name):
         TorchModelV2.__init__(self, obs_space, action_space, num_outputs, model_config, name)
         nn.Module.__init__(self)
 
-        # self.conv_layers = nn.Sequential(
-        #     SlimConv2d(obs_space.shape[-1], 16, kernel=2),
-        #     SlimConv2d(16, 32, kernel=2),
-        #     SlimConv2d(32, 64, kernel=2),
-        # )
-
         self.conv_layers = nn.Sequential(
-            nn.Conv2d(obs_space.shape[-1], 16, (2, 2)),
-            nn.ReLU(),
-            nn.Conv2d(16, 32, (2, 2)),
-            nn.ReLU(),
-            nn.Conv2d(32, 64, (2, 2)),
-            nn.ReLU(),
-            nn.Flatten(),
+            nn.Conv2d(obs_space.shape[-1], 32, kernel_size=3, stride=2, padding=1),  # Output: 40x40x32
+            nn.Conv2d(32, 64, kernel_size=3, stride=2, padding=1),  # Output: 20x20x64
+            nn.Conv2d(64, 128, kernel_size=3, stride=2, padding=1),  # Output: 10x10x128
+            nn.Conv2d(128, 256, kernel_size=3, stride=1, padding=1),  # Output: 7x7x256
+            nn.AdaptiveMaxPool2d((1, 1))
         )
 
         with torch.no_grad():
             dummy_input = torch.zeros(1, *obs_space.shape).permute(0, 3, 1, 2)
-            conv_out_size = self.conv_layers(dummy_input).flatten(1).shape[-1]
+            self.conv_out_size = self.conv_layers(dummy_input).flatten(1).shape[-1]
+            feature_in = self.conv_out_size
 
         self.fc_layers = nn.Sequential(
-            SlimFC(conv_out_size, 512),
-            SlimFC(512, action_space.n)
+            SlimFC(feature_in, 256),
+            SlimFC(256, 128),
+            SlimFC(128, 128),
+            SlimFC(128, action_space.n)
         )
         self._features = None
 

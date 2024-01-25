@@ -9,8 +9,8 @@ which python
 
 # Define paths
 _path="/jmain02/home/J2AD006/jxb06/cxz46-jxb06/Block_ExperienceReplay/"
-_log="/jmain02/home/J2AD006/jxb06/cxz46-jxb06/logging/minigrid/DistShift2/"
-_checkpoint="/jmain02/home/J2AD006/jxb06/cxz46-jxb06/checkpoints/minigrid/DistShift2/"
+_log="/jmain02/home/J2AD006/jxb06/cxz46-jxb06/logging/minigrid/BlockedUnlockPickup/"
+_checkpoint="/jmain02/home/J2AD006/jxb06/cxz46-jxb06/checkpoints/minigrid/MiniGrid-ObstructedMaze-1Dlhb/"
 
 # Change directory
 cd $_path || exit
@@ -21,6 +21,4 @@ python $_path/apex_dpber.py \
     -S $_path/settings/apex.yml \
     -L $_log \
     -C $_checkpoint \
-    -E DistShift2
-
-
+    -E MiniGrid-ObstructedMaze-1Dlhb

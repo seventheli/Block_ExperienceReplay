@@ -11,15 +11,13 @@ from ray.rllib.models import ModelCatalog
 from model import CNN
 from ray.tune.registry import register_env
 from ray.tune.logger import JsonLogger
-from algorithms.apex_ddqn import ApexDDQNWithDPBER
-from replay_buffer.mpber import MultiAgentPrioritizedBlockReplayBuffer
+from ray.rllib.algorithms.dqn import DQNConfig
 
 from utils import minigrid_env_creator as env_creator
 
-# Init Ray
 ray.init(
-    num_cpus=20, num_gpus=1,
-    include_dashboard=True,
+    num_cpus=6, num_gpus=1,
+    include_dashboard=False,
     _system_config={"maximum_gcs_destroyed_actor_cached_count": 200},
 )
 
@@ -35,7 +33,7 @@ env_name = parser.parse_args().env_path
 run_name = str(parser.parse_args().run_name)
 log_path = parser.parse_args().log_path
 checkpoint_path = parser.parse_args().checkpoint_path
-run_name = env_name + " dpber " + run_name
+run_name = env_name + " per " + run_name
 
 # Check path available
 check_path(log_path)
@@ -63,7 +61,6 @@ hyper_parameters["env_config"] = {
     "agent_pov": False
 }
 
-# Build env
 register_env(env_name, env_creator)
 
 env_example = env_creator(hyper_parameters["env_config"])
@@ -82,22 +79,11 @@ hyper_parameters["model"] = {
     "custom_model_config": {},
 }
 
-# Set BER
-sub_buffer_size = hyper_parameters["rollout_fragment_length"]
-replay_buffer_config = {
-    **hyper_parameters["replay_buffer_config"],
-    "type": MultiAgentPrioritizedBlockReplayBuffer,
-    "capacity": int(hyper_parameters["replay_buffer_config"]["capacity"]),
-    "obs_space": env_example.observation_space,
-    "action_space": env_example.action_space,
-    "sub_buffer_size": sub_buffer_size,
-    "worker_side_prioritization": False,
-    "replay_buffer_shards_colocated_with_driver": True,
-    "rollout_fragment_length": hyper_parameters["rollout_fragment_length"]
-}
-hyper_parameters["replay_buffer_config"] = replay_buffer_config
-hyper_parameters["train_batch_size"] = int(hyper_parameters["train_batch_size"] / sub_buffer_size)
-trainer = ApexDDQNWithDPBER(config=hyper_parameters, env=env_name)
+# Set trainer
+config = DQNConfig().environment("example")
+config.update_from_dict(hyper_parameters)
+trainer = config.build()
+
 
 checkpoint_path = str(checkpoint_path)
 with open(os.path.join(checkpoint_path, "%s_config.pyl" % run_name), "wb") as f:
