@@ -8,6 +8,9 @@ import numpy as np
 from gymnasium import spaces
 from mpu.ml import indices2one_hot
 from typing import Dict, Tuple, Union
+from minigrid.wrappers import RGBImgObsWrapper, ImgObsWrapper
+from gymnasium.experimental.wrappers import ResizeObservationV0
+from gymnasium.wrappers import TimeLimit
 
 agent_dir = {
     0: '>',
@@ -16,9 +19,9 @@ agent_dir = {
     3: '^',
 }
 
+
 def minigrid_env_creator(env_config):
     env = gymnasium.make(env_config["id"], render_mode="rgb_array")
-    # env = FullyObsWrapper(env)
     env = RGBImgObsWrapper(env, tile_size=env_config["tile_size"])
     env = ImgObsWrapper(env)
     env = ResizeObservationV0(env, (env_config["img_size"], env_config["img_size"]))
