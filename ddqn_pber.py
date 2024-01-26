@@ -63,14 +63,12 @@ hyper_parameters["env_config"] = {
 }
 
 # Build env
-register_env(env_name, env_creator)
-
 env_example = env_creator(hyper_parameters["env_config"])
 obs, _ = env_example.reset()
 step = env_example.step(1)
 print(env_example.action_space, env_example.observation_space)
 
-register_env("example", env_creator)
+register_env(env_name, env_creator)
 
 ModelCatalog.register_custom_model("CNN", CNN)
 
