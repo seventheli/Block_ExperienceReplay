@@ -49,6 +49,10 @@ setting = Dynaconf(envvar_prefix="DYNACONF", settings_files=setting)
 
 hyper_parameters = setting.hyper_parameters.to_dict()
 hyper_parameters["logger_config"] = {"type": JsonLogger, "logdir": checkpoint_path}
+
+# Build env
+hyper_parameters = setting.hyper_parameters.to_dict()
+hyper_parameters["logger_config"] = {"type": JsonLogger, "logdir": checkpoint_path}
 hyper_parameters["env_config"] = {
     "id": env_name,
     "size": 12,
@@ -63,12 +67,10 @@ hyper_parameters["env_config"] = {
 }
 
 env_example = env_creator(hyper_parameters["env_config"])
-
 obs, _ = env_example.reset()
 step = env_example.step(1)
 print(env_example.action_space, env_example.observation_space)
-
-register_env(env_name, env_creator)
+register_env("example", env_creator)
 
 ModelCatalog.register_custom_model("CNN", CNN)
 
@@ -80,7 +82,7 @@ hyper_parameters["model"] = {
 }
 
 # Set trainer
-config = ApexDQNConfig().environment(env_name)
+config = ApexDQNConfig().environment("example")
 config.update_from_dict(hyper_parameters)
 trainer = config.build()
 

@@ -49,6 +49,10 @@ setting = Dynaconf(envvar_prefix="DYNACONF", settings_files=setting)
 
 hyper_parameters = setting.hyper_parameters.to_dict()
 hyper_parameters["logger_config"] = {"type": JsonLogger, "logdir": checkpoint_path}
+
+# Build env
+hyper_parameters = setting.hyper_parameters.to_dict()
+hyper_parameters["logger_config"] = {"type": JsonLogger, "logdir": checkpoint_path}
 hyper_parameters["env_config"] = {
     "id": env_name,
     "size": 12,
@@ -62,13 +66,11 @@ hyper_parameters["env_config"] = {
     "agent_pov": False
 }
 
-# Build env
 env_example = env_creator(hyper_parameters["env_config"])
 obs, _ = env_example.reset()
 step = env_example.step(1)
 print(env_example.action_space, env_example.observation_space)
-
-register_env(env_name, env_creator)
+register_env("example", env_creator)
 
 ModelCatalog.register_custom_model("CNN", CNN)
 
@@ -87,7 +89,7 @@ replay_buffer_config = {
 }
 hyper_parameters["replay_buffer_config"] = replay_buffer_config
 hyper_parameters["train_batch_size"] = int(hyper_parameters["train_batch_size"] / sub_buffer_size)
-trainer = DDQNWithMPBER(config=hyper_parameters, env=env_name)
+trainer = DDQNWithMPBER(config=hyper_parameters, env="example")
 
 checkpoint_path = str(checkpoint_path)
 with open(os.path.join(checkpoint_path, "%s_config.pyl" % run_name), "wb") as f:
