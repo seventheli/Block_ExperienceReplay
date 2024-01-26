@@ -9,7 +9,7 @@ which python
 
 # Define paths
 _path="/jmain02/home/J2AD006/jxb06/cxz46-jxb06/Block_ExperienceReplay/"
-_log="/jmain02/home/J2AD006/jxb06/cxz46-jxb06/logging/minigrid/BlockedUnlockPickup/"
+_log="/jmain02/home/J2AD006/jxb06/cxz46-jxb06/logging/minigrid/MiniGrid-Empty-8x8/"
 _checkpoint="/jmain02/home/J2AD006/jxb06/cxz46-jxb06/checkpoints/minigrid/MiniGrid-Empty-8x8/"
 
 # Change directory

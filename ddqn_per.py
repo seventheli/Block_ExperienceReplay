@@ -82,7 +82,6 @@ config = DQNConfig().environment(env_name)
 config.update_from_dict(hyper_parameters)
 trainer = config.build()
 
-
 checkpoint_path = str(checkpoint_path)
 with open(os.path.join(checkpoint_path, "%s_config.pyl" % run_name), "wb") as f:
     pickle.dump(trainer.config.to_dict(), f)
