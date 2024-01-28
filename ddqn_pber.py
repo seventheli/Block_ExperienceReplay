@@ -16,8 +16,9 @@ from replay_buffer.mpber import MultiAgentPrioritizedBlockReplayBuffer
 
 from utils import minigrid_env_creator as env_creator
 
+# Init Ray
 ray.init(
-    num_cpus=6, num_gpus=1,
+    num_cpus=20, num_gpus=1,
     include_dashboard=False,
     _system_config={"maximum_gcs_destroyed_actor_cached_count": 200},
 )
@@ -74,7 +75,14 @@ register_env("example", env_creator)
 
 ModelCatalog.register_custom_model("CNN", CNN)
 
-# Set BER
+hyper_parameters["model"] = {
+    "custom_model": "CNN",
+    "no_final_linear": True,
+    "fcnet_hiddens": hyper_parameters["hiddens"],
+    "custom_model_config": {},
+}
+
+# Set trainer
 sub_buffer_size = hyper_parameters["rollout_fragment_length"]
 replay_buffer_config = {
     **setting.dqn.hyper_parameters.replay_buffer_config.to_dict(),
