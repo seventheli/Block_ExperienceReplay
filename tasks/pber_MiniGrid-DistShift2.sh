@@ -18,7 +18,7 @@ cd $_path || exit
 # Run Python script
 python $_path/ddqn_pber.py \
     -R $SLURM_JOB_ID \
-    -S $_path/settings/apex.yml \
+    -S $_path/settings/ddqn.yml \
     -L $_log \
     -C $_checkpoint \
     -E MiniGrid-DistShift2
