@@ -85,7 +85,7 @@ hyper_parameters["model"] = {
 # Set trainer
 sub_buffer_size = hyper_parameters["rollout_fragment_length"]
 replay_buffer_config = {
-    **setting.dqn.hyper_parameters.replay_buffer_config.to_dict(),
+    **setting.hyper_parameters.replay_buffer_config.to_dict(),
     "type": MultiAgentPrioritizedBlockReplayBuffer,
     "obs_space": env_example.observation_space,
     "action_space": env_example.action_space,
