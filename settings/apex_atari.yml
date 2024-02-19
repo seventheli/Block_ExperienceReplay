@@ -19,10 +19,10 @@ hyper_parameters:
   num_gpus: 1
   num_cpus_per_worker: 3
   num_gpus_per_worker: 0.01
-  num_envs_per_worker: 2
-  num_workers: 4
+  num_envs_per_worker: 16
+  num_workers: 5
   num_steps_sampled_before_learning_starts: 20000
-  rollout_fragment_length: 16
+  rollout_fragment_length: 32
   target_network_update_freq: 50000
   train_batch_size: 512
   min_sample_timesteps_per_iteration: 10000

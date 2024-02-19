@@ -10,6 +10,7 @@ from mpu.ml import indices2one_hot
 from typing import Dict, Tuple, Union
 from minigrid.wrappers import RGBImgObsWrapper, ImgObsWrapper
 from gymnasium.wrappers import TimeLimit, ResizeObservation
+from ray.rllib.env.wrappers.atari_wrappers import wrap_deepmind
 
 agent_dir = {
     0: '>',
@@ -26,6 +27,15 @@ def minigrid_env_creator(env_config):
     env = ResizeObservation(env, (env_config["img_size"], env_config["img_size"]))
     env = TimeLimit(env, max_episode_steps=env_config["max_steps"])
     return env
+
+
+def env_creator(env_config):
+    if env_config["id"][0:8] == "MiniGrid":
+        return minigrid_env_creator(env_config)
+    else:
+        env = gymnasium.make(env_config["id"], render_mode="rgb_array")
+        return wrap_deepmind(env)
+
 
 
 def get_size(obj):
