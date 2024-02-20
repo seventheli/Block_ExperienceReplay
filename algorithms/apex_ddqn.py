@@ -1,13 +1,87 @@
 from ray.rllib.utils.typing import EnvCreator
 from ray.rllib.algorithms.apex_dqn import ApexDQN
-from ray.rllib.utils.metrics import NUM_ENV_STEPS_TRAINED, NUM_AGENT_STEPS_TRAINED
 from ray.rllib.utils.typing import AlgorithmConfigDict
+import copy
+import platform
+from collections import defaultdict
+
+import ray
+from ray.rllib.algorithms.algorithm_config import AlgorithmConfig
+from algorithms.learner_thread import LearnerThread
+from ray.rllib.algorithms.dqn.learner_thread import LearnerThread as OriginalLearnerThread
+from ray.rllib.utils.actor_manager import FaultTolerantActorManager
+from ray.rllib.utils.actors import create_colocated_actors
+from ray.rllib.utils.annotations import override
+from ray.rllib.utils.metrics import (
+    NUM_AGENT_STEPS_TRAINED,
+    NUM_ENV_STEPS_TRAINED,
+)
+from ray.tune.trainable import Trainable
 
 
 class ApexDDQNWithDPBER(ApexDQN):
 
     def _init(self, config: AlgorithmConfigDict, env_creator: EnvCreator) -> None:
         super(ApexDDQNWithDPBER, self)._init(config, env_creator)
+
+    # @override(Trainable)
+    # def setup(self, config: AlgorithmConfig):
+    #     super().setup(config)
+    #
+    #     num_replay_buffer_shards = self.config.optimizer["num_replay_buffer_shards"]
+    #
+    #     # Create copy here so that we can modify without breaking other logic
+    #     replay_actor_config = copy.deepcopy(self.config.replay_buffer_config)
+    #
+    #     replay_actor_config["capacity"] = (
+    #             self.config.replay_buffer_config["capacity"] // num_replay_buffer_shards
+    #     )
+    #
+    #     ReplayActor = ray.remote(num_cpus=0, max_restarts=-1)(
+    #         replay_actor_config["type"]
+    #     )
+    #
+    #     # Place all replay buffer shards on the same node as the learner
+    #     # (driver process that runs this execution plan).
+    #     if replay_actor_config["replay_buffer_shards_colocated_with_driver"]:
+    #         _replay_actors = create_colocated_actors(
+    #             actor_specs=[  # (class, args, kwargs={}, count)
+    #                 (
+    #                     ReplayActor,
+    #                     None,
+    #                     replay_actor_config,
+    #                     num_replay_buffer_shards,
+    #                 )
+    #             ],
+    #             node=platform.node(),  # localhost
+    #         )[
+    #             0
+    #         ]  # [0]=only one item in `actor_specs`.
+    #     # Place replay buffer shards on any node(s).
+    #     else:
+    #         _replay_actors = [
+    #             ReplayActor.remote(*replay_actor_config)
+    #             for _ in range(num_replay_buffer_shards)
+    #         ]
+    #     self._replay_actor_manager = FaultTolerantActorManager(
+    #         _replay_actors,
+    #         max_remote_requests_in_flight_per_actor=(
+    #             self.config.max_requests_in_flight_per_replay_worker
+    #         ),
+    #     )
+    #     self._replay_req_timeout_s = self.config.timeout_s_replay_manager
+    #     self._sample_req_tiemeout_s = self.config.timeout_s_sampler_manager
+    #     if self.config.get("ram_saver", False):
+    #         self.learner_thread = LearnerThread(self.workers.local_worker())
+    #     else:
+    #         self.learner_thread = OriginalLearnerThread(self.workers.local_worker())
+    #
+    #     self.learner_thread.start()
+    #     self.steps_since_update = defaultdict(int)
+    #     weights = self.workers.local_worker().get_weights()
+    #     self.curr_learner_weights = ray.put(weights)
+    #     self.curr_num_samples_collected = 0
+    #     self._num_ts_trained_since_last_target_update = 0
 
     def update_replay_sample_priority(self) -> None:
         """Update the priorities of the sample batches with new priorities that are

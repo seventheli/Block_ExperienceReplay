@@ -1,4 +1,7 @@
+import time
+
 import numpy as np
+import ray
 from gymnasium.spaces import Space
 from typing import Dict
 from ray.rllib.utils.annotations import override, DeveloperAPI
@@ -9,12 +12,48 @@ from ray.rllib.utils.replay_buffers.multi_agent_prioritized_replay_buffer import
 from ray.rllib.utils.replay_buffers.prioritized_replay_buffer import PrioritizedReplayBuffer
 from replay_buffer.replay_node import BaseBuffer
 from ray.rllib.utils.replay_buffers import StorageUnit
+from ray.rllib.policy.sample_batch import SampleBatch
 from ray.util.debug import log_once
 
+import zlib
 import logging
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+
+@ray.remote
+def update_sample_batch(sample_batch, weight, store):
+    obs = zlib.compress(sample_batch["obs"], 1)
+    obs = np.frombuffer(obs, dtype=np.uint8)
+    length_obs = np.array(obs.shape)
+    obs = np.concatenate([np.frombuffer(obs, dtype=np.uint8),
+                          np.array([0] * (len(sample_batch["obs"]) * store - len(obs)), dtype=np.uint8)])
+    obs = obs.reshape(len(sample_batch["obs"]), store)
+
+    new_obs = zlib.compress(sample_batch["new_obs"], 1)
+    new_obs = np.frombuffer(new_obs, dtype=np.uint8)
+    length_new_obs = np.array(new_obs.shape)
+    new_obs = np.concatenate([np.frombuffer(new_obs, dtype=np.uint8),
+                              np.array([0] * (len(sample_batch["new_obs"]) * store - len(new_obs)), dtype=np.uint8)])
+    new_obs = new_obs.reshape(len(sample_batch["obs"]), store)
+
+    data = SampleBatch(
+        {
+            "obs": obs,
+            "new_obs": new_obs,
+            "actions": sample_batch["actions"],
+            "rewards": sample_batch["rewards"],
+            "terminateds": sample_batch["terminateds"],
+            "truncateds": sample_batch["truncateds"],
+            "weights": sample_batch["weights"],
+            "length_obs": length_obs,
+            "length_new_obs": length_new_obs,
+            "shape": sample_batch["shape"]
+
+        }
+    )
+    return data, weight
 
 
 class PrioritizedBlockReplayBuffer(PrioritizedReplayBuffer):
@@ -25,11 +64,18 @@ class PrioritizedBlockReplayBuffer(PrioritizedReplayBuffer):
             randomly: bool = False,
             sub_buffer_size: int = 32,
             beta=0.6,
+            store=2000,
+            ram_saver=False,
+            num_save=200,
             **kwargs
     ):
         super(PrioritizedBlockReplayBuffer, self).__init__(**kwargs)
         self.beta = beta
+        self.store = store
         self.base_buffer = BaseBuffer(sub_buffer_size, obs_space, action_space, randomly)
+        self._sub_store = []
+        self.ram_saver = ram_saver
+        self.num_save = num_save
 
     def sample(self, num_items: int, **kwargs):
         return super(PrioritizedBlockReplayBuffer, self).sample(num_items, **kwargs)
@@ -49,12 +95,24 @@ class PrioritizedBlockReplayBuffer(PrioritizedReplayBuffer):
             return
         buffer = self.base_buffer
         self.base_buffer.add(batch)
-        if buffer.full:
+        if self.ram_saver:
+            data = buffer.sample()
+            weight = np.mean(data.get("weights"))
+            buffer.reset()
+            self._sub_store.append([data, weight])
+            if len(self._sub_store) == self.num_save:
+                result_ids = [update_sample_batch.remote(batch[0],
+                                                         batch[1],
+                                                         self.store) for batch in self._sub_store]
+                results = ray.get(result_ids)
+                for each in results:
+                    self._add_single_batch(each[0], weight=each[1])
+                self._sub_store = []
+        else:
             data = buffer.sample()
             weight = np.mean(data.get("weights"))
             buffer.reset()
             self._add_single_batch(data, weight=weight)
-
 
 @DeveloperAPI
 class MultiAgentPrioritizedBlockReplayBuffer(MultiAgentPrioritizedReplayBuffer):

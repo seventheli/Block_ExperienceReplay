@@ -59,22 +59,21 @@ step = env_example.step(1)
 print(env_example.action_space, env_example.observation_space)
 register_env("example", env_creator)
 
-print("log path: %s \n check_path: %s" % (log_path, checkpoint_path))
+print("log path: %s; check_path: %s" % (log_path, checkpoint_path))
 if hyper_parameters["double_q"]:
-    run_name = "APEX_DDQN"
+    double_q = "DDQN"
 else:
-    run_name = "APEX_DQN"
+    double_q = "DQN"
 
 if sub_buffer_size == 0:
     # Set run object
-    run_name = run_name + "_" + env_name + "_DPER_%d" % parser.parse_args().run_name
+    run_name = "APEX_%s_%s" % (double_q, env_name) + "_DPER_%d" % run_name
     config = ApexDQNConfig().environment("example")
     config.update_from_dict(hyper_parameters)
     trainer = config.build()
 else:
     # Set run object
-    run_name = run_name + "_" + env_name + "_DPBER_%d" % parser.parse_args().run_name
-    sub_buffer_size = hyper_parameters["rollout_fragment_length"]
+    run_name = "APEX_DDQN_" + env_name + "_DPBER_%d" % run_name
     replay_buffer_config = {
         **hyper_parameters["replay_buffer_config"],
         "type": MultiAgentPrioritizedBlockReplayBuffer,
