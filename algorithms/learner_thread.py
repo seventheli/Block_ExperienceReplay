@@ -1,11 +1,15 @@
+import time
+
+from ray.rllib.policy.sample_batch import SampleBatch, MultiAgentBatch
 from ray.rllib.algorithms.dqn.learner_thread import LearnerThread as OriginalLearnerThread
 from ray.rllib.utils.metrics.learner_info import LearnerInfoBuilder
+from itertools import chain
+from utils import split_list_into_n_parts
 import ray
 import numpy as np
 import zlib
-import time
 
-@ray.remote
+
 def decompress_data(data_info):
     data, length, shape = data_info
     compressed_item = data[:length]
@@ -14,27 +18,50 @@ def decompress_data(data_info):
     return array
 
 
-def parallel_decompress(obs, lengths, shapes):
-    data_info_list = list(zip(obs, lengths, shapes))
-    result_ids = [decompress_data.remote(batch) for batch in data_info_list]
-    return ray.get(result_ids)
+@ray.remote(num_cpus=1, max_calls=200)
+def decompress_data_loop(rows):
+    _ = []
+    for each in rows:
+        _.append(decompress_data(each))
+    return _
+
+
+def parallel_decompress(obs, lengths_obs, shapes, new_obs, lengths_new_obs):
+    data_info_list = list(zip(obs, lengths_obs, shapes)) + list(zip(new_obs, lengths_new_obs, shapes))
+    data_info_list = split_list_into_n_parts(data_info_list, 4)
+    result_ids = [decompress_data_loop.remote(batch) for batch in data_info_list]
+    results = ray.get(result_ids)
+    results = list(chain(*results))
+    midpoint = len(results) // 2
+    decompressed_obs, decompressed_new_obs = results[:midpoint], results[midpoint:]
+    return decompressed_obs, decompressed_new_obs
 
 
 def update_ma_batch(ma_batch):
     _ = time.time()
     obs = ma_batch["default_policy"]["obs"].reshape(len(ma_batch["default_policy"]["shape"]), -1)
     new_obs = ma_batch["default_policy"]["new_obs"].reshape(len(ma_batch["default_policy"]["shape"]), -1)
-    decompressed_obs = parallel_decompress(obs,
-                                           ma_batch["default_policy"]["length_obs"],
-                                           ma_batch["default_policy"]["shape"])
-    decompressed_new_obs = parallel_decompress(new_obs,
-                                               ma_batch["default_policy"]["length_new_obs"],
-                                               ma_batch["default_policy"]["shape"])
+    decompressed_obs, decompressed_new_obs = parallel_decompress(
+        obs, ma_batch["default_policy"]["length_obs"], ma_batch["default_policy"]["shape"],
+        new_obs, ma_batch["default_policy"]["length_new_obs"]
+    )
     obs = np.concatenate(decompressed_obs)
     new_obs = np.concatenate(decompressed_new_obs)
-    ma_batch["default_policy"]["obs"] = obs
-    ma_batch["default_policy"]["new_obs"] = new_obs
-    return ma_batch
+    data = SampleBatch(
+        {
+            "obs": obs,
+            "new_obs": new_obs,
+            "actions": ma_batch["default_policy"]["actions"],
+            "rewards": ma_batch["default_policy"]["rewards"],
+            "terminateds": ma_batch["default_policy"]["terminateds"],
+            "truncateds": ma_batch["default_policy"]["truncateds"],
+            "weights": ma_batch["default_policy"]["weights"],
+            "batch_indexes": ma_batch["default_policy"]["batch_indexes"],
+        }
+    )
+    updated_mab = MultiAgentBatch({"default_policy": data},
+                                  env_steps=ma_batch["default_policy"].count)
+    return updated_mab
 
 
 class LearnerThread(OriginalLearnerThread):
@@ -48,6 +75,7 @@ class LearnerThread(OriginalLearnerThread):
             if ma_batch is not None:
                 prio_dict = {}
                 ma_batch = update_ma_batch(ma_batch)
+                # ma_batch = ray.get(ma_batch)
                 with self.grad_timer:
                     # Use LearnerInfoBuilder as a unified way to build the
                     # final results dict from `learn_on_loaded_batch` call(s).

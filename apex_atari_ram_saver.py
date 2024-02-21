@@ -1,17 +1,16 @@
 import os
 import ray
-import argparse
 import json
-import pickle
 import tqdm
+import pickle
+import argparse
 from os import path
-from utils import check_path, convert_np_arrays, env_creator
+from algorithms.apex_ddqn_ram_saver import ApexDDQNWithDPBER
 from dynaconf import Dynaconf
-from ray.tune.registry import register_env
 from ray.tune.logger import JsonLogger
-from ray.rllib.algorithms.apex_dqn import ApexDQNConfig
-from algorithms.apex_ddqn import ApexDDQNWithDPBER
-from replay_buffer.mpber import MultiAgentPrioritizedBlockReplayBuffer
+from replay_buffer.mpber_ram_saver import MultiAgentPrioritizedBlockReplayBuffer
+from ray.tune.registry import register_env
+from utils import check_path, convert_np_arrays, env_creator
 
 # Init Ray
 ray.init(
@@ -58,36 +57,25 @@ obs, _ = env_example.reset()
 step = env_example.step(1)
 print(env_example.action_space, env_example.observation_space)
 register_env("example", env_creator)
-
 print("log path: %s; check_path: %s" % (log_path, checkpoint_path))
-if hyper_parameters["double_q"]:
-    double_q = "DDQN"
-else:
-    double_q = "DQN"
 
-if sub_buffer_size == 0:
-    # Set run object
-    run_name = "APEX_%s_%s" % (double_q, env_name) + "_DPER_%d" % run_name
-    config = ApexDQNConfig().environment("example")
-    config.update_from_dict(hyper_parameters)
-    trainer = config.build()
-else:
-    # Set run object
-    run_name = "APEX_DDQN_" + env_name + "_DPBER_%d" % run_name
-    replay_buffer_config = {
-        **hyper_parameters["replay_buffer_config"],
-        "type": MultiAgentPrioritizedBlockReplayBuffer,
-        "capacity": int(hyper_parameters["replay_buffer_config"]["capacity"]),
-        "obs_space": env_example.observation_space,
-        "action_space": env_example.action_space,
-        "sub_buffer_size": sub_buffer_size,
-        "worker_side_prioritization": False,
-        "replay_buffer_shards_colocated_with_driver": True,
-        "rollout_fragment_length": hyper_parameters["rollout_fragment_length"]
-    }
-    hyper_parameters["replay_buffer_config"] = replay_buffer_config
-    hyper_parameters["train_batch_size"] = int(hyper_parameters["train_batch_size"] / sub_buffer_size)
-    trainer = ApexDDQNWithDPBER(config=hyper_parameters, env="example")
+# Set run object
+run_name = "Remote_RAM_SAVER_APEX_DDQN_" + env_name + "_DPBER_%d" % run_name
+replay_buffer_config = {
+    **hyper_parameters["replay_buffer_config"],
+    "type": MultiAgentPrioritizedBlockReplayBuffer,
+    "capacity": int(hyper_parameters["replay_buffer_config"]["capacity"]),
+    "obs_space": env_example.observation_space,
+    "action_space": env_example.action_space,
+    "sub_buffer_size": sub_buffer_size,
+    "worker_side_prioritization": False,
+    "replay_buffer_shards_colocated_with_driver": True,
+    "rollout_fragment_length": hyper_parameters["rollout_fragment_length"],
+    "num_save": 200,
+}
+hyper_parameters["replay_buffer_config"] = replay_buffer_config
+hyper_parameters["train_batch_size"] = int(hyper_parameters["train_batch_size"] / sub_buffer_size)
+trainer = ApexDDQNWithDPBER(config=hyper_parameters, env="example")
 
 checkpoint_path = str(checkpoint_path)
 with open(os.path.join(checkpoint_path, "%s_config.pyl" % run_name), "wb") as f:

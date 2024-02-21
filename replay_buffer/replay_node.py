@@ -89,8 +89,8 @@ class BaseBuffer(ABC):
 
         data = SampleBatch(
             {
-                "obs": self.obs[batch_ids],
-                "new_obs": self.new_obs[batch_ids],
+                "obs": self.obs[batch_ids, :],
+                "new_obs": self.new_obs[batch_ids, :],
                 "actions": self.actions[batch_ids],
                 "rewards": self.rewards[batch_ids],
                 "terminateds": self.terminateds[batch_ids],

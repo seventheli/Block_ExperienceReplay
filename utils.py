@@ -20,6 +20,13 @@ agent_dir = {
 }
 
 
+def split_list_into_n_parts(lst, n=10):
+    p = len(lst) // n
+    parts = [lst[i * p:(i + 1) * p] for i in range(n - 1)]
+    parts.append(lst[(n - 1) * p:])
+    return parts
+
+
 def minigrid_env_creator(env_config):
     env = gymnasium.make(env_config["id"], render_mode="rgb_array")
     env = RGBImgObsWrapper(env, tile_size=env_config["tile_size"])
@@ -35,7 +42,6 @@ def env_creator(env_config):
     else:
         env = gymnasium.make(env_config["id"], render_mode="rgb_array")
         return wrap_deepmind(env)
-
 
 
 def get_size(obj):
