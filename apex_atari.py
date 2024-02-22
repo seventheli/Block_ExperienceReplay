@@ -30,7 +30,7 @@ parser.add_argument("-SBZ", "--sbz", dest="sub_buffer_size", type=int)
 
 # Config path
 env_name = parser.parse_args().env_path
-sub_buffer_size = int(parser.parse_args().sbz)
+sub_buffer_size = int(parser.parse_args().sub_buffer_size)
 run_name = str(parser.parse_args().run_name)
 log_path = parser.parse_args().log_path
 checkpoint_path = parser.parse_args().checkpoint_path
