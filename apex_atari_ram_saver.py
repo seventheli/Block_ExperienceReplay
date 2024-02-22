@@ -60,7 +60,7 @@ register_env("example", env_creator)
 print("log path: %s; check_path: %s" % (log_path, checkpoint_path))
 
 # Set run object
-run_name = "Remote_RAM_SAVER_APEX_DDQN_" + env_name + "_DPBER_%d" % run_name
+run_name = "Remote_RAM_SAVER_APEX_DDQN_" + env_name + "_DPBER_%s" % run_name
 replay_buffer_config = {
     **hyper_parameters["replay_buffer_config"],
     "type": MultiAgentPrioritizedBlockReplayBuffer,

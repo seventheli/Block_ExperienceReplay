@@ -67,13 +67,13 @@ else:
 
 if sub_buffer_size == 0:
     # Set run object
-    run_name = "APEX_%s_%s" % (double_q, env_name) + "_DPER_%d" % run_name
+    run_name = "APEX_%s_%s" % (double_q, env_name) + "_DPER_%s" % run_name
     config = ApexDQNConfig().environment("example")
     config.update_from_dict(hyper_parameters)
     trainer = config.build()
 else:
     # Set run object
-    run_name = "APEX_DDQN_" + env_name + "_DPBER_%d" % run_name
+    run_name = "APEX_DDQN_" + env_name + "_DPBER_%s" % run_name
     replay_buffer_config = {
         **hyper_parameters["replay_buffer_config"],
         "type": MultiAgentPrioritizedBlockReplayBuffer,
