@@ -1,18 +1,14 @@
 import os
 import ray
 import argparse
-import json
-import pickle
-import tqdm
-from os import path
-from utils import check_path, convert_np_arrays
+from model import CNN
 from dynaconf import Dynaconf
 from ray.rllib.models import ModelCatalog
-from model import CNN
+from run_trainer import run_loop
+from ray.rllib.algorithms.apex_dqn import ApexDQNConfig
 from ray.tune.registry import register_env
 from ray.tune.logger import JsonLogger
-from ray.rllib.algorithms.apex_dqn import ApexDQNConfig
-
+from utils import check_path
 from utils import minigrid_env_creator as env_creator
 
 # Init Ray
@@ -38,10 +34,10 @@ run_name = env_name + " dper " + run_name
 
 # Check path available
 check_path(log_path)
-log_path = str(path.join(log_path, run_name))
+log_path = str(os.path.join(log_path, run_name))
 check_path(log_path)
 check_path(checkpoint_path)
-checkpoint_path = path.join(checkpoint_path, run_name)
+checkpoint_path = os.path.join(checkpoint_path, run_name)
 check_path(checkpoint_path)
 
 setting = parser.parse_args().setting_path
@@ -51,8 +47,6 @@ hyper_parameters = setting.hyper_parameters.to_dict()
 hyper_parameters["logger_config"] = {"type": JsonLogger, "logdir": checkpoint_path}
 
 # Build env
-hyper_parameters = setting.hyper_parameters.to_dict()
-hyper_parameters["logger_config"] = {"type": JsonLogger, "logdir": checkpoint_path}
 hyper_parameters["env_config"] = {
     "id": env_name,
     "size": 12,
@@ -71,6 +65,7 @@ obs, _ = env_example.reset()
 step = env_example.step(1)
 print(env_example.action_space, env_example.observation_space)
 register_env("example", env_creator)
+print("log path: %s; check_path: %s" % (log_path, checkpoint_path))
 
 ModelCatalog.register_custom_model("CNN", CNN)
 
@@ -86,21 +81,10 @@ config = ApexDQNConfig().environment("example")
 config.update_from_dict(hyper_parameters)
 trainer = config.build()
 
-checkpoint_path = str(checkpoint_path)
-with open(os.path.join(checkpoint_path, "%s_config.pyl" % run_name), "wb") as f:
-    pickle.dump(trainer.config.to_dict(), f)
-
-checkpoint_path = str(path.join(checkpoint_path, "results"))
-check_path(checkpoint_path)
-
-# Run algorithms
-for i in tqdm.tqdm(range(1, setting.log.max_run)):
-    result = trainer.train()
-    time_used = result["time_total_s"]
-    if i % setting.log.log == 0:
-        trainer.save_checkpoint(checkpoint_path)
-    with open(path.join(log_path, str(i) + ".json"), "w") as f:
-        result["config"] = None
-        json.dump(convert_np_arrays(result), f)
-    if time_used >= setting.log.max_time:
-        break
+run_loop(trainer=trainer,
+         log=setting.log.log,
+         max_run=setting.log.max_run,
+         max_time=setting.log.max_time,
+         checkpoint_path=checkpoint_path,
+         log_path=log_path,
+         run_name=run_name)

@@ -1,12 +1,11 @@
 import os
 import ray
 import argparse
-from algorithms.apex_ddqn import ApexDDQNWithDPBER
 from dynaconf import Dynaconf
 from run_trainer import run_loop
-from ray.tune.logger import JsonLogger
-from replay_buffer.mpber_ram_saver import MultiAgentPrioritizedBlockReplayBuffer
+from ray.rllib.algorithms.apex_dqn import ApexDQNConfig
 from ray.tune.registry import register_env
+from ray.tune.logger import JsonLogger
 from utils import check_path, env_creator
 
 # Init Ray
@@ -22,15 +21,13 @@ parser.add_argument("-S", "--setting", dest="setting_path", type=str)
 parser.add_argument("-L", "--log_path", dest="log_path", type=str)
 parser.add_argument("-C", "--checkpoint_path", dest="checkpoint_path", type=str)
 parser.add_argument("-E", "--env", dest="env_path", type=str)
-parser.add_argument("-SBZ", "--sbz", dest="sub_buffer_size", type=int)
 
 # Config path
 env_name = parser.parse_args().env_path
-sub_buffer_size = int(parser.parse_args().sub_buffer_size)
 run_name = str(parser.parse_args().run_name)
 log_path = parser.parse_args().log_path
 checkpoint_path = parser.parse_args().checkpoint_path
-run_name = "APEX_DDQN_%s" % env_name + "_DPBER_RAM_SAVER_%s" % run_name
+run_name = "APEX_DDQN_%s" % env_name + "_DPER_%s" % run_name
 
 # Check path available
 check_path(log_path)
@@ -59,21 +56,9 @@ register_env("example", env_creator)
 print("log path: %s; check_path: %s" % (log_path, checkpoint_path))
 
 # Set trainer
-replay_buffer_config = {
-    **hyper_parameters["replay_buffer_config"],
-    "type": MultiAgentPrioritizedBlockReplayBuffer,
-    "capacity": int(hyper_parameters["replay_buffer_config"]["capacity"]),
-    "obs_space": env_example.observation_space,
-    "action_space": env_example.action_space,
-    "sub_buffer_size": sub_buffer_size,
-    "worker_side_prioritization": False,
-    "replay_buffer_shards_colocated_with_driver": True,
-    "rollout_fragment_length": hyper_parameters["rollout_fragment_length"],
-    "num_save": 200,
-}
-hyper_parameters["replay_buffer_config"] = replay_buffer_config
-hyper_parameters["train_batch_size"] = int(hyper_parameters["train_batch_size"] / sub_buffer_size)
-trainer = ApexDDQNWithDPBER(config=hyper_parameters, env="example")
+config = ApexDQNConfig().environment("example")
+config.update_from_dict(hyper_parameters)
+trainer = config.build()
 
 run_loop(trainer=trainer,
          log=setting.log.log,
