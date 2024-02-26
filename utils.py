@@ -21,10 +21,7 @@ agent_dir = {
 
 
 def split_list_into_n_parts(lst, n=10):
-    p = len(lst) // n
-    parts = [lst[i * p:(i + 1) * p] for i in range(n - 1)]
-    parts.append(lst[(n - 1) * p:])
-    return parts
+    return [lst[i::n] for i in range(n)]
 
 
 def minigrid_env_creator(env_config):
