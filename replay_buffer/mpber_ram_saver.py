@@ -115,14 +115,16 @@ class PrioritizedBlockReplayBuffer(PrioritizedReplayBuffer):
             beta=0.6,
             store=2000,
             num_save=200,
+            split_mini_batch=10,
             **kwargs
     ):
         super(PrioritizedBlockReplayBuffer, self).__init__(**kwargs)
         self.beta = beta
         self.store = store
+        self.num_save = num_save
+        self.split_mini_batch = split_mini_batch
         self.base_buffer = BaseBuffer(sub_buffer_size, obs_space, action_space, randomly)
         self._sub_store = []
-        self.num_save = num_save
 
     def sample(self, num_items: int, **kwargs):
         return super(PrioritizedBlockReplayBuffer, self).sample(num_items, **kwargs)
@@ -148,9 +150,8 @@ class PrioritizedBlockReplayBuffer(PrioritizedReplayBuffer):
             buffer.reset()
             self._sub_store.append([data, weight])
         if len(self._sub_store) == self.num_save:
-            _list = split_list_into_n_parts(self._sub_store)
-            result_ids = [compress_sample_batch_loop.remote(batch,
-                                                            self.store) for batch in _list]
+            _list = split_list_into_n_parts(self._sub_store, n=self.split_mini_batch)
+            result_ids = [compress_sample_batch_loop.remote(batch, self.store) for batch in _list]
             results = ray.get(result_ids)
             results = list(chain(*results))
             for each in results:
@@ -185,6 +186,7 @@ class MultiAgentPrioritizedBlockReplayBuffer(MultiAgentPrioritizedReplayBuffer):
             prioritized_replay_alpha: float = 0.6,
             prioritized_replay_beta: float = 0.4,
             prioritized_replay_eps: float = 1e-6,
+            split_mini_batch=10,
             **kwargs
     ):
         """Initializes a MultiAgentReplayBuffer instance.
@@ -258,6 +260,7 @@ class MultiAgentPrioritizedBlockReplayBuffer(MultiAgentPrioritizedReplayBuffer):
             "sub_buffer_size": sub_buffer_size,
             "alpha": prioritized_replay_alpha,
             "beta": prioritized_replay_beta,
+            "split_mini_batch": split_mini_batch,
         }
         MultiAgentPrioritizedReplayBuffer.__init__(
             self,

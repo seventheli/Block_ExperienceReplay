@@ -69,10 +69,12 @@ replay_buffer_config = {
     "worker_side_prioritization": False,
     "replay_buffer_shards_colocated_with_driver": True,
     "rollout_fragment_length": hyper_parameters["rollout_fragment_length"],
-    "num_save": 200,
+    "num_save": 400,
+    "split_mini_batch": 20
 }
 hyper_parameters["replay_buffer_config"] = replay_buffer_config
 hyper_parameters["train_batch_size"] = int(hyper_parameters["train_batch_size"] / sub_buffer_size)
+hyper_parameters["optimizer"] = {"num_replay_buffer_shards": 10}
 trainer = ApexDDQNWithDPBER(config=hyper_parameters, env="example")
 
 run_loop(trainer=trainer,
