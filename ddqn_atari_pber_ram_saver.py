@@ -67,7 +67,6 @@ replay_buffer_config = {
     "sub_buffer_size": sub_buffer_size,
     "worker_side_prioritization": False,
     "replay_buffer_shards_colocated_with_driver": True,
-    "replay_sequence_length": 1,
     "rollout_fragment_length": hyper_parameters["rollout_fragment_length"],
     "num_save": 400,
     "split_mini_batch": 20

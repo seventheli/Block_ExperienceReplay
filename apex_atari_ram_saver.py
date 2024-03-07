@@ -1,10 +1,10 @@
 import os
 import ray
 import argparse
-from algorithms.apex_ddqn import ApexDDQNWithDPBER
 from dynaconf import Dynaconf
 from run_trainer import run_loop
 from ray.tune.logger import JsonLogger
+from algorithms.apex_ddqn import ApexDDQNWithDPBER
 from replay_buffer.mpber_ram_saver import MultiAgentPrioritizedBlockReplayBuffer
 from ray.tune.registry import register_env
 from utils import check_path, env_creator

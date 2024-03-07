@@ -3,9 +3,9 @@ import ray
 import argparse
 from dynaconf import Dynaconf
 from run_trainer import run_loop
+from ray.tune.logger import JsonLogger
 from ray.rllib.algorithms.apex_dqn import ApexDQNConfig
 from ray.tune.registry import register_env
-from ray.tune.logger import JsonLogger
 from utils import check_path, env_creator
 
 # Init Ray
