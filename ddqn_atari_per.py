@@ -3,9 +3,9 @@ import ray
 import argparse
 from dynaconf import Dynaconf
 from run_trainer import run_loop
-from ray.rllib.algorithms.apex_dqn import ApexDQNConfig
-from ray.tune.registry import register_env
 from ray.tune.logger import JsonLogger
+from ray.rllib.algorithms.dqn import DQNConfig
+from ray.tune.registry import register_env
 from utils import check_path, env_creator
 
 # Init Ray
@@ -27,7 +27,7 @@ env_name = parser.parse_args().env_path
 run_name = str(parser.parse_args().run_name)
 log_path = parser.parse_args().log_path
 checkpoint_path = parser.parse_args().checkpoint_path
-run_name = "APEX_DDQN_%s" % env_name + "_DPER_%s" % run_name
+run_name = "DDQN_%s" % env_name + "_PER_%s" % run_name
 
 # Check path available
 check_path(log_path)
@@ -44,8 +44,6 @@ hyper_parameters = setting.hyper_parameters.to_dict()
 hyper_parameters["logger_config"] = {"type": JsonLogger, "logdir": checkpoint_path}
 
 # Build env
-hyper_parameters = setting.hyper_parameters.to_dict()
-hyper_parameters["logger_config"] = {"type": JsonLogger, "logdir": checkpoint_path}
 hyper_parameters["env_config"] = {
     "id": env_name,
 }
@@ -58,7 +56,8 @@ register_env("example", env_creator)
 print("log path: %s; check_path: %s" % (log_path, checkpoint_path))
 
 # Set trainer
-config = ApexDQNConfig().environment("example")
+config = DQNConfig().environment("example")
+hyper_parameters["optimizer"] = {"num_replay_buffer_shards": 10}
 config.update_from_dict(hyper_parameters)
 trainer = config.build()
 

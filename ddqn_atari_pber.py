@@ -3,9 +3,10 @@ import ray
 import argparse
 from dynaconf import Dynaconf
 from run_trainer import run_loop
-from ray.rllib.algorithms.apex_dqn import ApexDQNConfig
-from ray.tune.registry import register_env
 from ray.tune.logger import JsonLogger
+from algorithms.ddqn_pber import DDQNWithMPBER
+from replay_buffer.mpber import MultiAgentPrioritizedBlockReplayBuffer
+from ray.tune.registry import register_env
 from utils import check_path, env_creator
 
 # Init Ray
@@ -21,13 +22,15 @@ parser.add_argument("-S", "--setting", dest="setting_path", type=str)
 parser.add_argument("-L", "--log_path", dest="log_path", type=str)
 parser.add_argument("-C", "--checkpoint_path", dest="checkpoint_path", type=str)
 parser.add_argument("-E", "--env", dest="env_path", type=str)
+parser.add_argument("-SBZ", "--sbz", dest="sub_buffer_size", type=int)
 
 # Config path
 env_name = parser.parse_args().env_path
+sub_buffer_size = int(parser.parse_args().sub_buffer_size)
 run_name = str(parser.parse_args().run_name)
 log_path = parser.parse_args().log_path
 checkpoint_path = parser.parse_args().checkpoint_path
-run_name = "APEX_DDQN_%s" % env_name + "_DPER_%s" % run_name
+run_name = "DDQN_%s" % env_name + "_PBER_%s" % run_name
 
 # Check path available
 check_path(log_path)
@@ -44,8 +47,6 @@ hyper_parameters = setting.hyper_parameters.to_dict()
 hyper_parameters["logger_config"] = {"type": JsonLogger, "logdir": checkpoint_path}
 
 # Build env
-hyper_parameters = setting.hyper_parameters.to_dict()
-hyper_parameters["logger_config"] = {"type": JsonLogger, "logdir": checkpoint_path}
 hyper_parameters["env_config"] = {
     "id": env_name,
 }
@@ -58,9 +59,21 @@ register_env("example", env_creator)
 print("log path: %s; check_path: %s" % (log_path, checkpoint_path))
 
 # Set trainer
-config = ApexDQNConfig().environment("example")
-config.update_from_dict(hyper_parameters)
-trainer = config.build()
+replay_buffer_config = {
+    **hyper_parameters["replay_buffer_config"],
+    "type": MultiAgentPrioritizedBlockReplayBuffer,
+    "obs_space": env_example.observation_space,
+    "action_space": env_example.action_space,
+    "sub_buffer_size": sub_buffer_size,
+    "worker_side_prioritization": False,
+    "replay_buffer_shards_colocated_with_driver": True,
+    "replay_sequence_length": 1,
+    "rollout_fragment_length": hyper_parameters["rollout_fragment_length"]
+}
+hyper_parameters["replay_buffer_config"] = replay_buffer_config
+hyper_parameters["train_batch_size"] = int(hyper_parameters["train_batch_size"] / sub_buffer_size)
+hyper_parameters["optimizer"] = {"num_replay_buffer_shards": 10}
+trainer = DDQNWithMPBER(config=hyper_parameters, env="example")
 
 run_loop(trainer=trainer,
          log=setting.log.log,
