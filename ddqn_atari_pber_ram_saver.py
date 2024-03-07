@@ -30,7 +30,7 @@ sub_buffer_size = int(parser.parse_args().sub_buffer_size)
 run_name = str(parser.parse_args().run_name)
 log_path = parser.parse_args().log_path
 checkpoint_path = parser.parse_args().checkpoint_path
-run_name = "DDQN_%s" % env_name + "_PBER_%s" % run_name
+run_name = "DDQN_%s" % env_name + "_PBER_RAM_SAVER_%s" % run_name
 
 # Check path available
 check_path(log_path)
