@@ -70,7 +70,6 @@ replay_buffer_config = {
     "rollout_fragment_length": hyper_parameters["rollout_fragment_length"]
 }
 hyper_parameters["replay_buffer_config"] = replay_buffer_config
-hyper_parameters["train_batch_size"] = int(hyper_parameters["train_batch_size"] / sub_buffer_size)
 hyper_parameters["optimizer"] = {"num_replay_buffer_shards": 10}
 trainer = DDQNWithMPBER(config=hyper_parameters, env="example")
 
