@@ -51,8 +51,6 @@ hyper_parameters = setting.hyper_parameters.to_dict()
 hyper_parameters["logger_config"] = {"type": JsonLogger, "logdir": checkpoint_path}
 
 # Build env
-hyper_parameters = setting.hyper_parameters.to_dict()
-hyper_parameters["logger_config"] = {"type": JsonLogger, "logdir": checkpoint_path}
 hyper_parameters["env_config"] = {
     "id": env_name,
     "size": 12,

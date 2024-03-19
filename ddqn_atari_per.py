@@ -42,6 +42,7 @@ setting = Dynaconf(envvar_prefix="DYNACONF", settings_files=setting)
 
 hyper_parameters = setting.hyper_parameters.to_dict()
 hyper_parameters["logger_config"] = {"type": JsonLogger, "logdir": checkpoint_path}
+hyper_parameters["optimizer"] = {"num_replay_buffer_shards": 10}
 
 # Build env
 hyper_parameters["env_config"] = {
@@ -57,7 +58,6 @@ print("log path: %s; check_path: %s" % (log_path, checkpoint_path))
 
 # Set trainer
 config = DQNConfig().environment("example")
-hyper_parameters["optimizer"] = {"num_replay_buffer_shards": 10}
 config.update_from_dict(hyper_parameters)
 trainer = config.build()
 

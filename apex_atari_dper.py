@@ -42,10 +42,8 @@ setting = Dynaconf(envvar_prefix="DYNACONF", settings_files=setting)
 
 hyper_parameters = setting.hyper_parameters.to_dict()
 hyper_parameters["logger_config"] = {"type": JsonLogger, "logdir": checkpoint_path}
-
+hyper_parameters["optimizer"] = {"num_replay_buffer_shards": 10}
 # Build env
-hyper_parameters = setting.hyper_parameters.to_dict()
-hyper_parameters["logger_config"] = {"type": JsonLogger, "logdir": checkpoint_path}
 hyper_parameters["env_config"] = {
     "id": env_name,
 }

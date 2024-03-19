@@ -48,8 +48,6 @@ hyper_parameters = setting.hyper_parameters.to_dict()
 hyper_parameters["logger_config"] = {"type": JsonLogger, "logdir": checkpoint_path}
 
 # Build env
-hyper_parameters = setting.hyper_parameters.to_dict()
-hyper_parameters["logger_config"] = {"type": JsonLogger, "logdir": checkpoint_path}
 hyper_parameters["env_config"] = {
     "id": env_name,
     "size": 12,
@@ -93,6 +91,7 @@ replay_buffer_config = {
 }
 hyper_parameters["replay_buffer_config"] = replay_buffer_config
 hyper_parameters["train_batch_size"] = int(hyper_parameters["train_batch_size"] / sub_buffer_size)
+hyper_parameters["optimizer"] = {"num_replay_buffer_shards": 10}
 trainer = DDQNWithMPBER(config=hyper_parameters, env="example")
 
 run_loop(trainer=trainer,
