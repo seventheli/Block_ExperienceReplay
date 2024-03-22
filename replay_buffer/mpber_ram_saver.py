@@ -188,6 +188,7 @@ class MultiAgentPrioritizedBlockReplayBuffer(MultiAgentPrioritizedReplayBuffer):
             prioritized_replay_eps: float = 1e-6,
             split_mini_batch=10,
             num_save=200,
+            store=2000,
             **kwargs
     ):
         """Initializes a MultiAgentReplayBuffer instance.
@@ -263,6 +264,7 @@ class MultiAgentPrioritizedBlockReplayBuffer(MultiAgentPrioritizedReplayBuffer):
             "beta": prioritized_replay_beta,
             "split_mini_batch": split_mini_batch,
             "num_save": num_save,
+            "store": store,
         }
         MultiAgentPrioritizedReplayBuffer.__init__(
             self,
