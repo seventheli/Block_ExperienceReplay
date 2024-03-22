@@ -21,9 +21,11 @@ parser.add_argument("-S", "--setting", dest="setting_path", type=str)
 parser.add_argument("-L", "--log_path", dest="log_path", type=str)
 parser.add_argument("-C", "--checkpoint_path", dest="checkpoint_path", type=str)
 parser.add_argument("-E", "--env", dest="env_path", type=str)
+parser.add_argument("-SBZ", "--sbz", dest="sub_buffer_size", type=int)
 
 # Config path
 env_name = parser.parse_args().env_path
+sub_buffer_size = int(parser.parse_args().sub_buffer_size)
 run_name = str(parser.parse_args().run_name)
 log_path = parser.parse_args().log_path
 checkpoint_path = parser.parse_args().checkpoint_path
