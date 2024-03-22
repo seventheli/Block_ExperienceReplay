@@ -1,3 +1,4 @@
+import logging
 import numpy as np
 from gymnasium.spaces import Space
 from typing import Dict
@@ -11,7 +12,6 @@ from replay_buffer.replay_node import BaseBuffer
 from ray.rllib.utils.replay_buffers import StorageUnit
 from ray.util.debug import log_once
 
-import logging
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -25,11 +25,16 @@ class PrioritizedBlockReplayBuffer(PrioritizedReplayBuffer):
             randomly: bool = False,
             sub_buffer_size: int = 32,
             beta=0.6,
+            store=2000,
+            num_save=200,
             **kwargs
     ):
         super(PrioritizedBlockReplayBuffer, self).__init__(**kwargs)
         self.beta = beta
+        self.store = store
+        self.num_save = num_save
         self.base_buffer = BaseBuffer(sub_buffer_size, obs_space, action_space, randomly)
+        self._sub_store = []
 
     def sample(self, num_items: int, **kwargs):
         return super(PrioritizedBlockReplayBuffer, self).sample(num_items, **kwargs)
@@ -53,7 +58,12 @@ class PrioritizedBlockReplayBuffer(PrioritizedReplayBuffer):
             data = buffer.sample()
             weight = np.mean(data.get("weights"))
             buffer.reset()
-            self._add_single_batch(data, weight=weight)
+            self._sub_store.append([data, weight])
+        if len(self._sub_store) == self.num_save:
+            for each in self._sub_store:
+                self._add_single_batch(each[0], weight=each[1])
+
+            self._sub_store = []
 
 
 @DeveloperAPI
@@ -82,6 +92,7 @@ class MultiAgentPrioritizedBlockReplayBuffer(MultiAgentPrioritizedReplayBuffer):
             prioritized_replay_alpha: float = 0.6,
             prioritized_replay_beta: float = 0.4,
             prioritized_replay_eps: float = 1e-6,
+            num_save=100,
             **kwargs
     ):
         """Initializes a MultiAgentReplayBuffer instance.
@@ -155,6 +166,7 @@ class MultiAgentPrioritizedBlockReplayBuffer(MultiAgentPrioritizedReplayBuffer):
             "sub_buffer_size": sub_buffer_size,
             "alpha": prioritized_replay_alpha,
             "beta": prioritized_replay_beta,
+            "num_save": num_save,
         }
         MultiAgentPrioritizedReplayBuffer.__init__(
             self,

@@ -238,6 +238,8 @@ class DDQNWithMPBERAndLogging(DQN):
 
         # Return all collected metrics for the iteration.
         self.time_usage["all"] += time.time() - _all_time_usage
+        for each in ["sample", "train", "update", "store"]:
+            self.time_usage[each + "_rate"] = self.time_usage[each] / self.time_usage["all"]
         train_results["time_usage"] = self.time_usage
         return train_results
 

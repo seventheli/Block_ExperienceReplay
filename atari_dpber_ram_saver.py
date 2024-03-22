@@ -4,7 +4,7 @@ import argparse
 from dynaconf import Dynaconf
 from run_trainer import run_loop
 from ray.tune.logger import JsonLogger
-from algorithms.ddqn_pber import DDQNWithMPBER
+from algorithms.apex_ddqn import ApexDDQNWithDPBER
 from replay_buffer.mpber_ram_saver import MultiAgentPrioritizedBlockReplayBuffer
 from ray.tune.registry import register_env
 from utils import check_path, env_creator
@@ -30,7 +30,7 @@ sub_buffer_size = int(parser.parse_args().sub_buffer_size)
 run_name = str(parser.parse_args().run_name)
 log_path = parser.parse_args().log_path
 checkpoint_path = parser.parse_args().checkpoint_path
-run_name = "DDQN_%s" % env_name + "_PBER_RAM_SAVER_%s" % run_name
+run_name = "APEX_DDQN_%s" % env_name + "_DPBER_RAM_SAVER_%s" % run_name
 
 # Check path available
 check_path(log_path)
@@ -62,18 +62,20 @@ print("log path: %s; check_path: %s" % (log_path, checkpoint_path))
 replay_buffer_config = {
     **hyper_parameters["replay_buffer_config"],
     "type": MultiAgentPrioritizedBlockReplayBuffer,
+    "capacity": int(hyper_parameters["replay_buffer_config"]["capacity"]),
     "obs_space": env_example.observation_space,
     "action_space": env_example.action_space,
     "sub_buffer_size": sub_buffer_size,
     "worker_side_prioritization": False,
     "replay_buffer_shards_colocated_with_driver": True,
     "rollout_fragment_length": hyper_parameters["rollout_fragment_length"],
-    "num_save": 400,
-    "split_mini_batch": 20
+    "num_save": 200,
+    "split_mini_batch": 10
 }
 hyper_parameters["replay_buffer_config"] = replay_buffer_config
+hyper_parameters["train_batch_size"] = int(hyper_parameters["train_batch_size"] / sub_buffer_size)
 hyper_parameters["optimizer"] = {"num_replay_buffer_shards": 10}
-trainer = DDQNWithMPBER(config=hyper_parameters, env="example")
+trainer = ApexDDQNWithDPBER(config=hyper_parameters, env="example")
 
 run_loop(trainer=trainer,
          log=setting.log.log,

@@ -20,6 +20,19 @@ agent_dir = {
 }
 
 
+def dicts_to_structured_array(dict_list):
+    keys = dict_list[0].keys()
+    dtype = [(key, 'float32') for key in keys]
+    structured_array = np.array([tuple(d.values()) for d in dict_list], dtype=dtype)
+    return structured_array
+
+
+def calculate_average_with_numpy(dict_list):
+    structured_array = dicts_to_structured_array(dict_list)
+    averages = {dtype[0]: structured_array[dtype[0]].mean() for dtype in structured_array.dtype.descr}
+    return averages
+
+
 def split_list_into_n_parts(lst, n=10):
     return [lst[i::n] for i in range(n)]
 

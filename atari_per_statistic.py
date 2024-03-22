@@ -2,10 +2,10 @@ import os
 import ray
 import argparse
 from dynaconf import Dynaconf
-from run_trainer import run_loop
+from run_trainer import run_loop_single
 from ray.tune.logger import JsonLogger
-from ray.rllib.algorithms.dqn import DQNConfig
 from ray.tune.registry import register_env
+from algorithms_with_statistics.ddqn_per import DDQNWithMPERAndLogging
 from utils import check_path, env_creator
 
 # Init Ray
@@ -21,9 +21,11 @@ parser.add_argument("-S", "--setting", dest="setting_path", type=str)
 parser.add_argument("-L", "--log_path", dest="log_path", type=str)
 parser.add_argument("-C", "--checkpoint_path", dest="checkpoint_path", type=str)
 parser.add_argument("-E", "--env", dest="env_path", type=str)
+parser.add_argument("-SBZ", "--sbz", dest="sub_buffer_size", type=int)
 
 # Config path
 env_name = parser.parse_args().env_path
+sub_buffer_size = int(parser.parse_args().sub_buffer_size)
 run_name = str(parser.parse_args().run_name)
 log_path = parser.parse_args().log_path
 checkpoint_path = parser.parse_args().checkpoint_path
@@ -42,7 +44,7 @@ setting = Dynaconf(envvar_prefix="DYNACONF", settings_files=setting)
 
 hyper_parameters = setting.hyper_parameters.to_dict()
 hyper_parameters["logger_config"] = {"type": JsonLogger, "logdir": checkpoint_path}
-hyper_parameters["optimizer"] = {"num_replay_buffer_shards": 10}
+hyper_parameters["optimizer"] = {"num_replay_buffer_shards": 1}
 
 # Build env
 hyper_parameters["env_config"] = {
@@ -57,14 +59,12 @@ register_env("example", env_creator)
 print("log path: %s; check_path: %s" % (log_path, checkpoint_path))
 
 # Set trainer
-config = DQNConfig().environment("example")
-config.update_from_dict(hyper_parameters)
-trainer = config.build()
+trainer = DDQNWithMPERAndLogging(config=hyper_parameters, env="example")
 
-run_loop(trainer=trainer,
-         log=setting.log.log,
-         max_run=setting.log.max_run,
-         max_time=setting.log.max_time,
-         checkpoint_path=checkpoint_path,
-         log_path=log_path,
-         run_name=run_name)
+run_loop_single(trainer=trainer,
+                log=setting.log.log,
+                max_run=setting.log.max_run,
+                max_time=setting.log.max_time,
+                checkpoint_path=checkpoint_path,
+                log_path=log_path,
+                run_name=run_name)

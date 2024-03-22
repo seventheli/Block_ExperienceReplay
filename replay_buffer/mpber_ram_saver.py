@@ -31,7 +31,7 @@ def decompress_data(data_info):
     return array
 
 
-def parallel_decompress(obs, lengths_obs, shapes, new_obs, lengths_new_obs):
+def decompress_parallel(obs, lengths_obs, shapes, new_obs, lengths_new_obs):
     data_info_list = list(zip(obs, lengths_obs, shapes)) + list(zip(new_obs, lengths_new_obs, shapes))
     results = []
     for each in data_info_list:
@@ -44,7 +44,7 @@ def parallel_decompress(obs, lengths_obs, shapes, new_obs, lengths_new_obs):
 def decompress_sample_batch(ma_batch):
     obs = ma_batch["obs"].reshape(len(ma_batch["shape"]), -1)
     new_obs = ma_batch["new_obs"].reshape(len(ma_batch["shape"]), -1)
-    decompressed_obs, decompressed_new_obs = parallel_decompress(
+    decompressed_obs, decompressed_new_obs = decompress_parallel(
         obs, ma_batch["length_obs"], ma_batch["shape"],
         new_obs, ma_batch["length_new_obs"]
     )
@@ -187,6 +187,7 @@ class MultiAgentPrioritizedBlockReplayBuffer(MultiAgentPrioritizedReplayBuffer):
             prioritized_replay_beta: float = 0.4,
             prioritized_replay_eps: float = 1e-6,
             split_mini_batch=10,
+            num_save=200,
             **kwargs
     ):
         """Initializes a MultiAgentReplayBuffer instance.
@@ -261,6 +262,7 @@ class MultiAgentPrioritizedBlockReplayBuffer(MultiAgentPrioritizedReplayBuffer):
             "alpha": prioritized_replay_alpha,
             "beta": prioritized_replay_beta,
             "split_mini_batch": split_mini_batch,
+            "num_save": num_save,
         }
         MultiAgentPrioritizedReplayBuffer.__init__(
             self,
