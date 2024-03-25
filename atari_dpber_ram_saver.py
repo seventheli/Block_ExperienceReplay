@@ -71,7 +71,7 @@ replay_buffer_config = {
     "rollout_fragment_length": hyper_parameters["rollout_fragment_length"],
     "num_save": 200,
     "split_mini_batch": 10,
-    "store": 2500
+    "store": 3000
 }
 hyper_parameters["replay_buffer_config"] = replay_buffer_config
 hyper_parameters["train_batch_size"] = int(hyper_parameters["train_batch_size"] / sub_buffer_size)

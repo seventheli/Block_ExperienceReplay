@@ -8,7 +8,6 @@ from algorithms.ddqn_pber import DDQNWithMPBER
 from replay_buffer.mpber_ram_saver import MultiAgentPrioritizedBlockReplayBuffer
 from ray.tune.registry import register_env
 from utils import check_path, env_creator
-
 # Init Ray
 ray.init(
     num_cpus=20, num_gpus=1,
@@ -70,7 +69,8 @@ replay_buffer_config = {
     "replay_buffer_shards_colocated_with_driver": True,
     "rollout_fragment_length": hyper_parameters["rollout_fragment_length"],
     "num_save": 100,
-    "split_mini_batch": 1
+    "split_mini_batch": 1,
+    "store": 3000
 }
 hyper_parameters["replay_buffer_config"] = replay_buffer_config
 trainer = DDQNWithMPBER(config=hyper_parameters, env="example")
