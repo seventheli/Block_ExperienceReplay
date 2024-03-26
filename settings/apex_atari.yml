@@ -18,17 +18,17 @@ hyper_parameters:
     prioritized_replay_beta: 1
     type: MultiAgentPrioritizedReplayBuffer
   num_gpus: 1
-  num_cpus_per_worker: 1
-  num_gpus_per_worker: 0.01
+  num_cpus_per_worker: 2
+  num_gpus_per_worker: 0.1
   num_envs_per_worker: 16
-  num_workers: 8
+  num_workers: 9
   num_steps_sampled_before_learning_starts: 100000
   rollout_fragment_length: 32
   target_network_update_freq: 50000
-  train_batch_size: 1024
+  train_batch_size: 512
   min_sample_timesteps_per_iteration: 25000
 run: APEX
 log:
-  max_run: 10000
+  max_run: 4000
   log: 10
   max_time: 360000

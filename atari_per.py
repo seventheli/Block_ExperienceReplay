@@ -48,18 +48,17 @@ hyper_parameters["optimizer"] = {"num_replay_buffer_shards": 1}
 
 # Build env
 hyper_parameters["env_config"] = {
-    "id": env_name,
+    "id": env_name + "NoFrameskip-v4",
 }
 
 env_example = env_creator(hyper_parameters["env_config"])
 obs, _ = env_example.reset()
 step = env_example.step(1)
 print(env_example.action_space, env_example.observation_space)
-register_env("example", env_creator)
 print("log path: %s; check_path: %s" % (log_path, checkpoint_path))
 
 # Set trainer
-config = DQNConfig().environment("example")
+config = DQNConfig().environment(env_name + "NoFrameskip-v4")
 config.update_from_dict(hyper_parameters)
 trainer = config.build()
 
