@@ -13,7 +13,7 @@ from utils import minigrid_env_creator as env_creator
 
 # Init Ray
 ray.init(
-    num_cpus=20, num_gpus=1,
+    num_cpus=16, num_gpus=1,
     include_dashboard=False,
     _system_config={"maximum_gcs_destroyed_actor_cached_count": 200},
 )
