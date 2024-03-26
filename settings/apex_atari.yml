@@ -7,15 +7,16 @@ hyper_parameters:
     final_epsilon: 0.01
   framework: torch
   hiddens:
-  - 512
+    - 512
   lr: 0.0001
   min_sample_timesteps_per_iteration: 25000
   n_step: 3
   noisy: false
   num_atoms: 1
+  num_cpus: 20
+  num_gpus: 1
   num_cpus_per_worker: 1
   num_envs_per_worker: 8
-  num_gpus: 1
   num_gpus_per_worker: 0.1
   num_workers: 5
   num_steps_sampled_before_learning_starts: 100000
