@@ -21,7 +21,7 @@ hyper_parameters:
   num_cpus_per_worker: 2
   num_gpus_per_worker: 0.1
   num_envs_per_worker: 16
-  num_workers: 9
+  num_workers: 5
   num_steps_sampled_before_learning_starts: 100000
   rollout_fragment_length: 32
   target_network_update_freq: 50000
@@ -29,6 +29,6 @@ hyper_parameters:
   min_sample_timesteps_per_iteration: 25000
 run: APEX
 log:
-  max_run: 4000
+  max_run: 20000
   log: 10
   max_time: 360000
