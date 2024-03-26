@@ -58,7 +58,7 @@ print(env_example.action_space, env_example.observation_space)
 print("log path: %s; check_path: %s" % (log_path, checkpoint_path))
 
 # Set trainer
-trainer = DDQNWithMPERAndLogging(config=hyper_parameters, env=env_name + "NoFrameskip-v4")
+trainer = DDQNWithMPERAndLogging(config=hyper_parameters, env="example")
 
 run_loop_single(trainer=trainer,
                 log=setting.log.log,

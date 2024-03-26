@@ -58,7 +58,7 @@ print(env_example.action_space, env_example.observation_space)
 print("log path: %s; check_path: %s" % (log_path, checkpoint_path))
 
 # Set trainer
-config = DQNConfig().environment(env_name + "NoFrameskip-v4")
+config = DQNConfig().environment("example")
 config.update_from_dict(hyper_parameters)
 trainer = config.build()
 
