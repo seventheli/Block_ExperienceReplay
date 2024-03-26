@@ -15,8 +15,6 @@ hyper_parameters:
   num_atoms: 1
   num_cpus: 5
   num_gpus: 1
-  num_gpus_per_worker: 0.1
-  num_workers: 1
   num_steps_sampled_before_learning_starts: 50000
   replay_buffer_config:
     capacity: 1000000
