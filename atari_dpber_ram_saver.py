@@ -53,7 +53,7 @@ hyper_parameters["optimizer"] = {"num_replay_buffer_shards": 10}
 
 env_example = wrap_deepmind(gym.make(env_name))
 
-obs, _ = env_example.reset()
+obs = env_example.reset()
 step = env_example.step(1)
 print(env_example.action_space, env_example.observation_space)
 print("log path: %s; check_path: %s" % (log_path, checkpoint_path))
