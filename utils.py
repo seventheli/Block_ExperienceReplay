@@ -5,8 +5,11 @@ import ray
 import yaml
 import numpy as np
 from gym import spaces
-from func_timeout import func_set_timeout
 from typing import Dict, Tuple, Union
+
+
+def split_list_into_n_parts(lst, n=10):
+    return [lst[i::n] for i in range(n)]
 
 
 def get_size(obj):
@@ -16,10 +19,10 @@ def get_size(obj):
 
     while obj_q:
         size += sum(sys.getsizeof(i) for i in obj_q)
-        all_refr = ((id(o), o) for o in gc.get_referents(*obj_q))
-        new_refr = {o_id: o for o_id, o in all_refr if o_id not in marked and not isinstance(o, type)}
-        obj_q = new_refr.values()
-        marked.update(new_refr.keys())
+        all_ref = ((id(o), o) for o in gc.get_referents(*obj_q))
+        new_ref = {o_id: o for o_id, o in all_ref if o_id not in marked and not isinstance(o, type)}
+        obj_q = new_ref.values()
+        marked.update(new_ref.keys())
 
     return size
 
@@ -42,34 +45,7 @@ def init_ray(ray_setting=None):
 
 def check_path(path):
     if not os.path.exists(path):
-        os.makedirs(path)
-
-
-@func_set_timeout(5)
-def log_with_timeout(client, run_id, key, value, step):
-    try:
-        client.log_metric(run_id, key=key, value=value, step=step)
-    except:
-        pass
-
-
-@func_set_timeout(5)
-def logs_with_timeout(data, step):
-    try:
-        mlflow.log_metrics(data, step)
-    except:
-        pass
-
-
-def flatten_dict(d):
-    flat_dict = {}
-    for key, value in d.items():
-        if isinstance(value, dict):
-            for subkey, subvalue in value.items():
-                flat_dict[subkey] = subvalue
-        else:
-            flat_dict[key] = value
-    return flat_dict
+        os.makedirs(path, exist_ok=True)
 
 
 def convert_np_arrays(obj):
@@ -81,6 +57,17 @@ def convert_np_arrays(obj):
         return [convert_np_arrays(item) for item in obj]
     else:
         return obj
+
+
+def flatten_dict(d):
+    flat_dict = {}
+    for key, value in d.items():
+        if isinstance(value, dict):
+            for subkey, sub_value in value.items():
+                flat_dict[subkey] = sub_value
+        else:
+            flat_dict[key] = value
+    return flat_dict
 
 
 # This function is copied from:
