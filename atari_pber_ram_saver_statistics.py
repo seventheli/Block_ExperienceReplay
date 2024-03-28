@@ -59,7 +59,7 @@ print("log path: %s; check_path: %s" % (log_path, checkpoint_path))
 
 # Set trainer
 replay_buffer_config = {
-    **hyper_parameters.replay_buffer_config.to_dict(),
+    **hyper_parameters["replay_buffer_config"],
     "type": MultiAgentPrioritizedBlockReplayBuffer,
     "obs_space": env_example.observation_space,
     "action_space": env_example.action_space,
@@ -73,7 +73,7 @@ replay_buffer_config = {
 }
 
 hyper_parameters["replay_buffer_config"] = replay_buffer_config
-trainer = DDQNWithMPBERAndLogging(config=hyper_parameters, env="example")
+trainer = DDQNWithMPBERAndLogging(config=hyper_parameters, env=env_name)
 
 run_loop(trainer=trainer,
          log=setting.log.log,

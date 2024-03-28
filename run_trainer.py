@@ -5,12 +5,14 @@ import pickle
 from utils import check_path, convert_np_arrays, flatten_dict
 
 
-def run_loop(trainer, max_run, log, log_path, max_time, checkpoint_path, run_name, use_normal=True):
+def run_loop(trainer, max_run, log, log_path, max_time, checkpoint_path, run_name, use_normal=False):
     # Common setup
     checkpoint_path = str(checkpoint_path)
     # Save initial configuration
-    with open(os.path.join(checkpoint_path, f"{run_name}_config.pyl"), "wb") as f:
-        pickle.dump(trainer.config.to_dict(), f)
+    with open(os.path.join(checkpoint_path, "%s_config.pyl" % run_name), "wb") as f:
+        _ = trainer.config.to_dict()
+        _.pop("multiagent")
+        pickle.dump(_, f)
 
     # Prepare checkpoint path for results
     results_path = os.path.join(checkpoint_path, "results")
